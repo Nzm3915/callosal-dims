@@ -141,4 +141,54 @@ reproduced the silencing response as well as a full-rank link, without any gatin
 neurons per side summarised by 20 PCs, not an estimate of the capacity of the whole corpus callosum.)
 
 Limitations: linear model (no attractor dynamics); unknown ceiling for R²; recovery after the laser is captured
-less well (0.29) than the laser epoch; per-animal specifications (modular vs asymmetric) not yet separated.
+less well (0.29) than the laser epoch. Nonlinear models and per-animal analyses: Phase 4.
+
+## Phase 4 — individual differences, and gating revisited with nonlinear models
+
+```
+python phase4/phase4_modularity_gating.py CACHE_DIR results/units_labeled.csv results/phase4
+python phase4/phase4_nonlinear.py CACHE_DIR results/units_labeled.csv results/phase4   # torch (CPU)
+python phase4/phase4_plot.py results
+```
+
+1. **Modularity** (Chen et al.): fraction of selectivity a hemisphere keeps while the other is silenced; recovery:
+   fraction regained at the end of the delay. Delay-selective labeled units, Chen's exclusion criteria.
+2. **Model-free gating test**: per hemisphere pair, B's choice confidence during the laser regressed on both
+   hemispheres' confidence just before the laser, in control and silencing trials:
+   y = b0 + b1 cB + b2 cA + stim·(c0 + c1 cB + c2 cA). H4 predicts c1 > 0 and c2 < 0.
+3. **Nonlinear model**: Phase 3 model + an MLP for B's own dynamics + a learned gate (from B's state and A's
+   activity) or a precision gate (κ, β learned); trained one step ahead with early stopping, tested free-running.
+
+![phase4](results/phase4/fig_phase4.png)
+
+| Finding | Value |
+| --- | --- |
+| Modular hemispheres recover better (Chen Fig. 4H) | ρ = 0.29, p = 5e-6 (247 pairs, 39 mice) |
+| **Which hemisphere drives is a trait of the mouse** | code-1 minus code-2 modularity differs across mice (25 mice with ≥ 3 sessions, ANOVA p = 9e-7); no overall side bias (p = 0.19) |
+| The level of modularity is only moderately individual | ~23% of its variance is between mice |
+| The Phase 3 specification does not depend on modularity | ρ = 0.06 with the 3-D receiving-subspace link's R² |
+| Not reproduced: modular sessions less correlated (Chen) | ρ = 0.04 with the Phase 1 correlation |
+| Silencing A lowers B's choice confidence | c0 = −0.29 (261 pairs, p = 5e-41) |
+| **…more, not less, when B was already confident (against H4)** | c1 = −0.11 (p = 2e-18); but less than a proportional shrinkage would give (−0.29; difference p = 9e-24) |
+| …and more when A was confident (H4's direction) | c2 = −0.05 (p = 1e-7), about what a proportional loss predicts |
+| Nonlinear dynamics do not improve the silencing response | full-rank fixed link: linear 0.35, nonlinear 0.36 (n.s.) |
+| **Gates do not help** | d = 3: fixed / learned / precision 0.22 / 0.22 / 0.22; d = 20: learned gate +0.016 (laser on), −0.003 after |
+| The precision gate collapses to a constant | median κ = 0.05; across-trial SD of the gate 0.014 |
+| **No model, gated or not, reproduces the choice-axis effect** | data c0 = −0.19, c1 = −0.08 vs models c0 ≈ −0.04 to −0.07, c1 ≈ −0.03 to −0.05 (PC / 100-ms representation) |
+
+Reading: the bulk of what one hemisphere contributes to the other is reproduced by a fixed low-dimensional link,
+with no gating and no nonlinearity. The small choice-axis component (5% of the response) shows a state dependence
+that none of the models capture — plausibly what Chen et al. described as state-dependent gating, but this data
+cannot tell gating apart from the receiving hemisphere's own choice attractor. Which side leads is an individual
+trait, so a callosal link would need per-animal calibration.
+
+## Conclusion
+
+| Specification of a callosal link (ALM, delay epoch) | Result |
+| --- | --- |
+| What to carry | the receiving subspace: ~3 dimensions, not the correlated subspace (14% overlap) and not mainly the choice axis (5%) |
+| How to learn it | from perturbation data; links fitted to normal activity alone predict nothing |
+| Delay | ≤ 100 ms |
+| Bit rate | ~90 bit/s (3 dims × 3 bits × 10 Hz), for ~40 neurons per side |
+| Gating | not needed for the bulk of the response; the choice-axis state dependence remains unexplained |
+| Individual calibration | needed: the leading hemisphere is a trait of the animal |
