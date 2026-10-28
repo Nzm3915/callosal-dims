@@ -34,8 +34,21 @@ RADS = {
     'hydroxyl':   ("O 0 0 0; H 0.970 0 0", 0),
     'superoxide': ("O 0 0 0; O 1.33 0 0", -1),
     'phenoxyl':   (None, 0),
+    'indolyl':    (None, 0),      # tryptophan radical model: 3-methylindole minus a hydrogen, spin on the ring
+    'flavin_iso': (None, 0),      # FAD model: the isoalloxazine's central ring reduced to a lumiflavin-like core
 }
 R_CONTACT = {'129Xe': 3.6, '131Xe': 3.6, '83Kr': 3.4, '3He': 3.0}   # van der Waals contact distances, A
+
+
+def ring_geom(R, placement, extra='', spin_atom=3):
+    """a benzene-like ring with a substituent; Xe above the ring plane (lobe) or in the plane beside it (node)"""
+    r = 1.40; ang = np.deg2rad([0, 60, 120, 180, 240, 300])
+    C = [(r * np.cos(a), r * np.sin(a)) for a in ang]
+    Hs = [(2.48 * np.cos(a), 2.48 * np.sin(a)) for a in ang[1:]]
+    body = extra + '; '.join(f"C {x:.4f} {y:.4f} 0" for x, y in C) + '; ' + \
+           '; '.join(f"H {x:.4f} {y:.4f} 0" for x, y in Hs)
+    pos = (C[spin_atom][0], C[spin_atom][1], R) if placement == 'lobe' else (C[spin_atom][0], C[spin_atom][1] + R, 0.0)
+    return pos, body
 
 
 def phenoxyl_geom(R, placement):
@@ -50,8 +63,15 @@ def phenoxyl_geom(R, placement):
 
 def coupling(guest_elem, rad, placement, R):
     """129Xe-equivalent coupling: computed with a xenon-like all-electron basis for the guest actually named"""
-    if rad == 'phenoxyl':
-        (x, y, z), body = phenoxyl_geom(R, placement)
+    if rad in ('phenoxyl', 'indolyl', 'flavin_iso'):
+        if rad == 'phenoxyl':
+            (x, y, z), body = phenoxyl_geom(R, placement)
+        elif rad == 'indolyl':
+            # pyrrole N fused at C1-C2 of the ring, reduced to an N-H bridge: a compact tryptophan-radical stand-in
+            (x, y, z), body = ring_geom(R, placement, extra="N 2.10 1.21 0; H 2.80 1.95 0; ", spin_atom=4)
+        else:
+            # two carbonyl oxygens on opposite ring carbons: a lumiflavin-like pi system
+            (x, y, z), body = ring_geom(R, placement, extra="O 2.65 0 0; O -2.65 0 0; ", spin_atom=1)
         atoms = f'{guest_elem} {x:.4f} {y:.4f} {z:.4f}; ' + body
     else:
         body, _ = RADS[rad]
@@ -73,9 +93,11 @@ def coupling(guest_elem, rad, placement, R):
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True); rows = []; t0 = time.time()
+    fn = os.path.join(OUT, os.environ.get('SCREEN_OUT', 'screen.json'))
     elems = {'129Xe': 'Xe', '131Xe': 'Xe', '83Kr': 'Kr', '3He': 'He'}
     rs = np.r_[0.0, np.geomspace(1e6, 1e10, 9)]
-    for rad in (['methyl', 'superoxide'] if QUICK else list(RADS)):
+    only = os.environ.get('RADS_ONLY')
+    for rad in (only.split(',') if only else (['methyl', 'superoxide'] if QUICK else list(RADS))):
         for placement in ('lobe', 'node'):
             cache = {}
             for g, (I, gN) in GUESTS.items():
@@ -107,5 +129,5 @@ if __name__ == '__main__':
                 print(f'{rad:11s} {placement:5s} {g:5s} a={a:+7.3f} mT  effect {rel0:+7.2f}% (r=0), '
                       f'{rel8:+6.2f}% (r=1e8), detectable up to r = {rmax:.0e} /s   [{round(time.time()-t0)} s]', flush=True)
                 rows[-1]['relaxation_skipped'] = bool(big)
-                json.dump(rows, open(os.path.join(OUT, 'screen.json'), 'w'), indent=1)
+                json.dump(rows, open(fn, 'w'), indent=1)
     print('done', round(time.time() - t0), 's')
