@@ -22,7 +22,7 @@ usage: python phase6_ramp.py CACHE_DIR LABELS_CSV OUTDIR
 import sys, os, glob, numpy as np, pandas as pd
 from scipy.optimize import minimize
 
-CACHE, LABELS, OUT = sys.argv[1:4]
+CACHE, LABELS, OUT = (sys.argv[1:4] + [None] * 3)[:3]
 rng = np.random.default_rng(62)
 PRE, LAS = (-2.1, -1.7), (-1.7, -0.9)
 

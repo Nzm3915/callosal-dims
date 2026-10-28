@@ -52,7 +52,8 @@ def prep(path, lab):
         for b in (True, False):
             m = (instR == a) & (lickR == b)
             if m.sum(): Y[m] -= Y[m].mean(0)
-    Y -= Y.mean(2, keepdims=True)                               # remove slow trial-to-trial offsets (as in the paper)
+    if not os.environ.get('KEEP_TRIAL_MEAN'):
+        Y -= Y.mean(2, keepdims=True)                           # remove slow trial-to-trial offsets (as in the paper)
     return dict(sess=sess, Y=Y.transpose(0, 2, 1).copy(), q1=len(units['code1']), q2=len(units['code2']),
                 units=units, n=len(ctrl))
 
@@ -130,7 +131,8 @@ if __name__ == '__main__':
     from dlag_summary import read_summary
     _s = read_summary(os.path.dirname(OUT.rstrip('/')) if os.path.basename(OUT.rstrip('/')) == 'phase6' else OUT)
     done = set(_s.session) if len(_s) else set()
-    for p in sorted(glob.glob(os.path.join(CACHE, '*.npz')))[I0:I1]:
+    step = int(os.environ.get('SUBSET_STEP', '1'))
+    for p in sorted(glob.glob(os.path.join(CACHE, '*.npz')))[I0:I1:step]:
         d = prep(p, lab)
         if d is None or d['sess'] in done: continue
         t = time.time(); row = run(d); row['sec'] = time.time() - t
