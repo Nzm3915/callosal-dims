@@ -6,6 +6,7 @@ with unilateral silencing in mouse ALM, toward the minimal specification of a ca
 ## Documents (Japanese)
 
 - [docs/01_mouse_callosal_dims.md](docs/01_mouse_callosal_dims.md) — background, questions, phases and results of this project
+- [docs/03_bold_hypotheses.md](docs/03_bold_hypotheses.md) — bold hypotheses (incl. quantum-brain and shared-consciousness claims) turned into algorithms and tested on this data
 - Follow-up master's research plan (split-brain world models): [Nzm3915/split-brain-world-models](https://github.com/Nzm3915/split-brain-world-models)
 
 Data: [DANDI 000894](https://dandiarchive.org/dandiset/000894) — simultaneous bilateral ALM recordings
