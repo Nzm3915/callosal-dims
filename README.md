@@ -34,6 +34,22 @@ and review.
 - Ran a self-auditing loop over all results (mouse-level statistics, unbiased ceilings, null models for each claim)
   and published the corrections it forced ([docs/00_review_log.md](docs/00_review_log.md)).
 
+## Spin-chemistry side project (`quantum/`)
+
+```
+python quantum/radical_pair.py results/quantum        # singlet-yield isotope effects, with spin relaxation
+python quantum/xe_hyperfine.py results/quantum        # all-electron DFT hyperfine of 129Xe next to small radicals
+python quantum/xe_hyperfine_ext.py results/quantum    # superoxide and phenoxyl (tyrosyl model)
+python quantum/xe_superoxide_curve.py results/quantum # Xe...O2*- binding curve, both pi* branches
+python quantum/energy_scales.py results/quantum       # kT, mass and spin energy scales at body temperature
+python quantum/xe_effect_bound.py results/quantum     # the effect size an experiment would see
+python quantum/spin_grid.py results/quantum           # the full (a, k, r, B) grid behind quantum/explorer/
+```
+
+`quantum/explorer/index.html` is an interactive map of that grid: move the hyperfine coupling, the radical-pair
+lifetime, the spin relaxation rate and the static field, and watch the isotope effect against the boundary an
+experiment could detect.
+
 ## Documents (Japanese)
 
 - [docs/01_mouse_callosal_dims.md](docs/01_mouse_callosal_dims.md) — background, questions, phases and results of this project

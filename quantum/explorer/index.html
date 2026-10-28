@@ -1,0 +1,250 @@
+<title>キセノン同位体効果の地図</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Public+Sans:wght@400;600&family=Spline+Sans+Mono:wght@400;600&display=swap">
+<style>
+/* layout: readout band on top, then a heat map of the two conditions that decide the effect, then the field panel */
+:root{
+  --bg:#f6f4ef; --panel:#fffdf9; --ink:#1c1e22; --ink-soft:#616671; --rule:#dedacf;
+  --hot:#b8452f; --cool:#1f6f78; --warn:#b07c1d; --dead:#8d8f95;
+  --serif:"Fraunces",Georgia,"Hiragino Mincho ProN",serif;
+  --sans:"Public Sans","Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif;
+  --mono:"Spline Sans Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#14161a; --panel:#1c1f24; --ink:#edebe6; --ink-soft:#9ba1ac; --rule:#2f333b;
+  --hot:#e4765c; --cool:#54b3bd; --warn:#dcae52; --dead:#6f737b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14161a; --panel:#1c1f24; --ink:#edebe6; --ink-soft:#9ba1ac; --rule:#2f333b;
+  --hot:#e4765c; --cool:#54b3bd; --warn:#dcae52; --dead:#6f737b; color-scheme:dark}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:28px 48px}
+.wrap{max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(1.6rem,4.4vw,2.35rem);line-height:1.15;margin:0;text-wrap:balance}
+h2{font-family:var(--serif);font-weight:600;font-size:1.1rem;margin:0}
+.lede{margin:0;color:var(--ink-soft);max-width:62ch}
+.eyebrow{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin:0}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.big{font-family:var(--mono);font-size:clamp(1.5rem,5vw,2.1rem);font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
+.big small{font-size:.5em;font-weight:400;color:var(--ink-soft);margin-left:.25em}
+.cap{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+.verdict{border-radius:8px;padding:11px 13px;font-weight:600;border:1px solid}
+.v-yes{color:var(--cool);border-color:color-mix(in oklab,var(--cool) 45%,transparent);background:color-mix(in oklab,var(--cool) 10%,transparent)}
+.v-no{color:var(--dead);border-color:var(--rule);background:color-mix(in oklab,var(--ink) 5%,transparent)}
+.v-edge{color:var(--warn);border-color:color-mix(in oklab,var(--warn) 45%,transparent);background:color-mix(in oklab,var(--warn) 10%,transparent)}
+label.slider{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:baseline;font-size:.86rem}
+label.slider .val{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:600}
+label.slider input{grid-column:1/-1;width:100%;accent-color:var(--hot);margin:0}
+.presets{display:flex;flex-wrap:wrap;gap:7px}
+button{font-family:var(--sans);font-size:.8rem;color:var(--ink);background:var(--panel);border:1px solid var(--rule);
+  border-radius:999px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--ink-soft)}
+button:focus-visible{outline:2px solid var(--cool);outline-offset:2px}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-family:var(--mono);font-size:.68rem;color:var(--ink-soft)}
+.swatch{display:inline-block;width:22px;height:9px;border-radius:2px;margin-right:5px;vertical-align:baseline}
+.note{margin:0;color:var(--ink-soft);font-size:.86rem}
+.note b{color:var(--ink)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;min-width:0}
+@media (max-width:620px){.grid2{grid-template-columns:1fr}}
+a{color:var(--cool)}
+table{border-collapse:collapse;width:100%;font-size:.84rem}
+td,th{padding:6px 8px;border-bottom:1px solid var(--rule);text-align:right;font-variant-numeric:tabular-nums}
+td:first-child,th:first-child{text-align:left}
+thead th{font-family:var(--mono);font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);font-weight:400}
+</style>
+
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:10px">
+    <p class="eyebrow">量子脳を細胞の水準で — 計算の地図</p>
+    <h1>核スピンが化学に効く余地は、どこに残っているか</h1>
+    <p class="lede">キセノンの同位体で麻酔の効きが違う、という報告がある。もし本当なら、効くしくみはラジカル対しかない。
+      そのラジカル対が、どれだけ長く生き、どれだけ強く結合し、どれだけ速くスピンを失うか。
+      四つのつまみを動かすと、同位体の差がその場で変わる。<b>密度汎関数法で計算した実際の値</b>と、
+      <b>細胞の実験で検出できる境界</b>を重ねてある。</p>
+  </header>
+
+  <div class="card">
+    <div class="readout">
+      <div><div class="cap">¹²⁹Xe の効果</div><div class="big" id="r129">–<small>%</small></div></div>
+      <div><div class="cap">¹³¹Xe の効果</div><div class="big" id="r131">–<small>%</small></div></div>
+      <div><div class="cap">細胞の実験での差</div><div class="big" id="rpts">–<small>ポイント</small></div></div>
+    </div>
+    <div class="verdict v-no" id="verdict">—</div>
+    <p class="note">「細胞の実験での差」は、一重項収率の同位体差が、キセノン50%での NMDA 電流の抑制率（約48%）にそのまま伝わると仮定した上限。
+      実験の設計は2ポイントの差を検出できる水準にしてある。</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>つまみ</h2>
+      <label class="slider"><span>¹²⁹Xe の超微細結合</span><span class="val" id="va">–</span>
+        <input type="range" id="sa" min="0" max="16" step="1" value="10"></label>
+      <label class="slider"><span>ラジカル対の寿命（1/k）</span><span class="val" id="vk">–</span>
+        <input type="range" id="sk" min="0" max="12" step="1" value="6"></label>
+      <label class="slider"><span>電子スピンの緩和の速さ</span><span class="val" id="vr">–</span>
+        <input type="range" id="sr" min="0" max="11" step="1" value="4"></label>
+      <p class="eyebrow" style="margin-top:4px">計算で求めた結合の値に合わせる</p>
+      <div class="presets" id="presets"></div>
+    </div>
+    <div class="card">
+      <h2>どこなら効果が出るか</h2>
+      <canvas id="heat" width="520" height="340" aria-label="寿命と緩和の速さに対する同位体効果の地図"></canvas>
+      <div class="legend">
+        <span><i class="swatch" style="background:linear-gradient(90deg,color-mix(in oklab,var(--cool) 12%,transparent),var(--hot))"></i>効果の大きさ</span>
+        <span><i class="swatch" style="background:var(--ink)"></i>2ポイントの境界</span>
+        <span>白い十字＝いまのつまみの位置</span>
+      </div>
+      <p class="note">横軸が電子スピンの緩和の速さ、縦軸がラジカル対の寿命。いまの超微細結合での地図。
+        右へ行くほど（緩和が速いほど）効果は消える。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>静磁場を変えると（ラジカル対であることの指紋）</h2>
+    <canvas id="field" width="880" height="260" aria-label="静磁場に対する同位体効果"></canvas>
+    <p class="note">ラジカル対なら、同位体の差の大きさは<b>外から掛ける磁場で変わる</b>。重さや結合の強さの違いでは、磁場で変わりようがない。
+      だから磁場を振ってみることが、しくみを見分ける決め手になる。縦の破線が地磁気（50 µT）。</p>
+  </div>
+
+  <div class="card">
+    <h2>計算で求めた結合の値</h2>
+    <table>
+      <thead><tr><th>状況</th><th>¹²⁹Xe の結合</th><th>根拠</th></tr></thead>
+      <tbody>
+        <tr><td>スーパーオキシドの横で自由に回る</td><td>0.36 mT</td><td>体温の分布で重みづけした平均</td></tr>
+        <tr><td>不対電子の軌道の真上に固定（底）</td><td>0.76 mT</td><td>3.4 Å</td></tr>
+        <tr><td>同じ向きでさらに近い</td><td>1.29 mT</td><td>3.0 Å</td></tr>
+        <tr><td>先行研究が実験に合わせた値</td><td>1.90 mT</td><td>Smith ら 2021</td></tr>
+      </tbody>
+    </table>
+    <p class="note">全電子・PBE0・分散補正つきの密度汎関数法。水素原子（1467 対 実測1420 MHz）とメチルの陽子（−2.9 対 −2.3 mT）で検算した。
+      エネルギーが低いのは<b>軌道が横を向く</b>（結合が小さい）場合なので、効果が出るには向きの固定が要る。</p>
+  </div>
+
+  <p class="note">コード：<a href="https://github.com/Nzm3915/callosal-dims">Nzm3915/callosal-dims</a> の <span style="font-family:var(--mono)">quantum/</span>（<span style="font-family:var(--mono)">radical_pair.py</span>、<span style="font-family:var(--mono)">xe_hyperfine.py</span>、<span style="font-family:var(--mono)">spin_grid.py</span>）。設計と判定の記録は <span style="font-family:var(--mono)">docs/03_quantum_brain.md</span>。</p>
+</div>
+
+<script>
+const I132 = 0.48, MARGIN = 2.0;
+let G = null, ia = 10, ik = 6, ir = 4;
+const fmtK = v => { const t = 1 / v; return t >= 1e-6 ? (t * 1e6).toFixed(t * 1e6 < 10 ? 1 : 0) + ' µs' : (t * 1e9).toFixed(t * 1e9 < 10 ? 1 : 0) + ' ns'; };
+const fmtR = v => v === 0 ? 'なし' : v.toExponential(0).replace('e+', '×10^') + ' /s';
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+function rel(i, j, l) { return [G.rel129[i][j][l], G.rel131[i][j][l]]; }
+function points(i, j, l) { const [a, b] = rel(i, j, l); return I132 * Math.abs((a + b) / 2); }
+
+function draw() {
+  const a = G.a_mT[ia], k = G.k[ik], r = G.r[ir];
+  const [e9, e1] = rel(ia, ik, ir), pts = points(ia, ik, ir);
+  document.getElementById('r129').innerHTML = e9.toFixed(1) + '<small>%</small>';
+  document.getElementById('r131').innerHTML = e1.toFixed(1) + '<small>%</small>';
+  document.getElementById('rpts').innerHTML = pts.toFixed(2) + '<small>ポイント</small>';
+  const v = document.getElementById('verdict');
+  if (pts >= MARGIN * 2) { v.className = 'verdict v-yes'; v.textContent = 'この条件なら、細胞の実験ではっきり見える差になる。'; }
+  else if (pts >= MARGIN) { v.className = 'verdict v-edge'; v.textContent = 'ぎりぎり検出できる。例数を増やすか、条件を絞る必要がある。'; }
+  else { v.className = 'verdict v-no'; v.textContent = 'この条件では、細胞の実験で差は見えない（2ポイント未満）。'; }
+  document.getElementById('va').textContent = a.toFixed(2) + ' mT';
+  document.getElementById('vk').textContent = fmtK(k);
+  document.getElementById('vr').textContent = fmtR(r);
+  heat(); field();
+}
+
+function fitCanvas(c, h) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2), w = c.clientWidth || 520;
+  c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+  c.style.height = h + 'px'; const x = c.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return [x, w, h];
+}
+
+function heat() {
+  const c = document.getElementById('heat'); const [x, W, H] = fitCanvas(c, 300);
+  const L = 54, Rr = 10, T = 12, B = 34, gw = W - L - Rr, gh = H - T - B;
+  const nr = G.r.length, nk = G.k.length;
+  x.clearRect(0, 0, W, H);
+  const cool = css('--cool'), hot = css('--hot'), ink = css('--ink'), soft = css('--ink-soft');
+  let max = 0;
+  for (let i = 0; i < nk; i++) for (let j = 0; j < nr; j++) max = Math.max(max, points(ia, i, j));
+  max = Math.max(max, 1e-6);
+  for (let i = 0; i < nk; i++) for (let j = 0; j < nr; j++) {
+    const t = Math.min(1, Math.pow(points(ia, i, j) / max, 0.6));
+    x.fillStyle = `color-mix(in oklab, ${hot} ${Math.round(t * 100)}%, color-mix(in oklab, ${cool} 12%, transparent))`;
+    x.fillRect(L + j * gw / nr, T + gh - (i + 1) * gh / nk, gw / nr + 0.6, gh / nk + 0.6);
+  }
+  // 2-point boundary: for each lifetime row, the relaxation column where the effect crosses the margin
+  x.strokeStyle = ink; x.lineWidth = 1.6; x.beginPath(); let started = false;
+  for (let i = 0; i < nk; i++) {
+    let jc = -1;
+    for (let j = 0; j < nr - 1; j++) { const a0 = points(ia, i, j), a1 = points(ia, i, j + 1);
+      if ((a0 - MARGIN) * (a1 - MARGIN) <= 0 && a0 !== a1) { jc = j + (MARGIN - a0) / (a1 - a0); break; } }
+    if (jc < 0) continue;
+    const px = L + (jc + 0.5) * gw / nr, py = T + gh - (i + 0.5) * gh / nk;
+    started ? x.lineTo(px, py) : x.moveTo(px, py); started = true;
+  }
+  if (started) x.stroke();
+  // current position
+  const cx = L + (ir + 0.5) * gw / nr, cy = T + gh - (ik + 0.5) * gh / nk;
+  x.strokeStyle = '#fff'; x.lineWidth = 2; x.beginPath();
+  x.moveTo(cx - 7, cy); x.lineTo(cx + 7, cy); x.moveTo(cx, cy - 7); x.lineTo(cx, cy + 7); x.stroke();
+  x.strokeStyle = ink; x.lineWidth = 1; x.strokeRect(L, T, gw, gh);
+  x.fillStyle = soft; x.font = '10px ' + css('--mono'); x.textAlign = 'right';
+  [0, Math.floor(nk / 2), nk - 1].forEach(i => x.fillText(fmtK(G.k[i]), L - 6, T + gh - (i + 0.5) * gh / nk + 3));
+  x.textAlign = 'center';
+  [1, Math.floor(nr / 2), nr - 1].forEach(j => x.fillText(G.r[j].toExponential(0), L + (j + 0.5) * gw / nr, T + gh + 14));
+  x.fillText('緩和の速さ (1/s) →', L + gw / 2, H - 6);
+  x.save(); x.translate(12, T + gh / 2); x.rotate(-Math.PI / 2); x.fillText('寿命 →', 0, 0); x.restore();
+}
+
+function field() {
+  const c = document.getElementById('field'); const [x, W, H] = fitCanvas(c, 230);
+  const L = 48, Rr = 14, T = 14, B = 36, gw = W - L - Rr, gh = H - T - B;
+  // nearest stored (a, r) combination
+  const aN = G.field_a.reduce((p, v, i) => Math.abs(v - G.a_mT[ia]) < Math.abs(G.field_a[p] - G.a_mT[ia]) ? i : p, 0);
+  const rN = G.field_r.reduce((p, v, i) => Math.abs(Math.log10(v + 1) - Math.log10(G.r[ir] + 1)) <
+    Math.abs(Math.log10(G.field_r[p] + 1) - Math.log10(G.r[ir] + 1)) ? i : p, 0);
+  const rows = G.field[aN][rN], B_ = G.B_mT;
+  const ink = css('--ink'), soft = css('--ink-soft'), hot = css('--hot'), cool = css('--cool');
+  x.clearRect(0, 0, W, H);
+  let lo = 0, hi = 0;
+  rows.forEach(v => { lo = Math.min(lo, v[1], v[2]); hi = Math.max(hi, v[1], v[2]); });
+  const span = Math.max(hi - lo, 1e-3), yv = v => T + gh - (v - lo) / span * gh;
+  const xv = b => L + Math.pow(b / B_[B_.length - 1], 0.5) * gw;
+  x.strokeStyle = soft; x.lineWidth = 1; x.beginPath(); x.moveTo(L, yv(0)); x.lineTo(L + gw, yv(0)); x.stroke();
+  x.setLineDash([3, 3]); x.beginPath(); x.moveTo(xv(0.05), T); x.lineTo(xv(0.05), T + gh); x.stroke(); x.setLineDash([]);
+  [[1, hot, '129Xe'], [2, cool, '131Xe']].forEach(([idx, col, name]) => {
+    x.strokeStyle = col; x.lineWidth = 2; x.beginPath();
+    rows.forEach((v, i) => i ? x.lineTo(xv(B_[i]), yv(v[idx])) : x.moveTo(xv(B_[i]), yv(v[idx])));
+    x.stroke();
+    x.fillStyle = col; x.font = '600 11px ' + css('--mono'); x.textAlign = 'left';
+    x.fillText(name, L + gw - 42, yv(rows[rows.length - 1][idx]) - 5);
+  });
+  x.strokeStyle = ink; x.strokeRect(L, T, gw, gh);
+  x.fillStyle = soft; x.font = '10px ' + css('--mono'); x.textAlign = 'right';
+  [lo, (lo + hi) / 2, hi].forEach(v => x.fillText(v.toFixed(1) + '%', L - 6, yv(v) + 3));
+  x.textAlign = 'center';
+  [0, 0.05, 0.5, 2, 5].forEach(b => { if (b <= B_[B_.length - 1]) x.fillText(b === 0.05 ? '50µT' : b + ' mT', xv(b), T + gh + 14); });
+  x.fillText(`静磁場　（結合 ${G.field_a[aN]} mT、緩和 ${G.field_r[rN].toExponential(0)} /s、寿命 18 ns で計算）`, L + gw / 2, H - 6);
+}
+
+const PRE = [['自由に回る 0.36 mT', 0.36], ['向きが固定 0.76 mT', 0.76], ['さらに近い 1.29 mT', 1.29], ['先行研究 1.9 mT', 1.896]];
+function wire() {
+  const pe = document.getElementById('presets');
+  PRE.forEach(([n, v]) => { const b = document.createElement('button'); b.textContent = n;
+    b.onclick = () => { ia = G.a_mT.reduce((p, x_, i) => Math.abs(x_ - v) < Math.abs(G.a_mT[p] - v) ? i : p, 0);
+      document.getElementById('sa').value = ia; draw(); }; pe.appendChild(b); });
+  const bind = (id, set, n) => { const el = document.getElementById(id); el.max = n - 1;
+    el.oninput = () => { set(+el.value); draw(); }; };
+  bind('sa', v => ia = v, G.a_mT.length); bind('sk', v => ik = v, G.k.length); bind('sr', v => ir = v, G.r.length);
+  document.getElementById('sa').value = ia = G.a_mT.reduce((p, x_, i) => Math.abs(x_ - 0.76) < Math.abs(G.a_mT[p] - 0.76) ? i : p, 0);
+  document.getElementById('sk').value = ik = G.k.reduce((p, x_, i) => Math.abs(Math.log10(x_ / 5.5e7)) < Math.abs(Math.log10(G.k[p] / 5.5e7)) ? i : p, 0);
+  document.getElementById('sr').value = ir = G.r.reduce((p, x_, i) => Math.abs(Math.log10((x_ || 1) / 1e7)) < Math.abs(Math.log10((G.r[p] || 1) / 1e7)) ? i : p, 0);
+  addEventListener('resize', () => { heat(); field(); });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { heat(); field(); });
+  draw();
+}
+fetch('spin_grid.json').then(r => r.json()).then(d => { G = d; wire(); })
+  .catch(() => { document.getElementById('verdict').textContent = '計算結果のデータを読み込めなかった。'; });
+</script>
