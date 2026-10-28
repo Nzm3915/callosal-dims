@@ -511,6 +511,7 @@ $$
 | 5.8 個体差 | `phase4/phase4_modularity_gating.py` | `results/phase4/phase4_modularity.csv` |
 | 監査（マウス単位の検定など） | `phase7/phase7_audit.py` | `results/phase7/phase7_audit.json` |
 | 自己査読への対応（ラベル・光の漏れ・行動・基準・同等性・マウスの中の相関） | `phase7/phase7_label_validation.py`、`phase7/phase7_referee.py` | `results/phase7/phase7_label_validation.json`、`phase7_referee.json` |
+| 本文の数値と結果ファイルの照合 | `phase7/phase7_check_docs.py` | （実行時に出力） |
 | 光の終わりの窓（利得の検査） | `phase7/phase7_rampdown.py`、`phase7_rampdown_mean.py` | `results/phase7/phase7_rampdown*.json` |
 
 ---
