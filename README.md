@@ -297,10 +297,11 @@ python phase7/phase7_rampdown.py CACHE_DIR results/units_labeled.csv results/pha
 python phase7/phase7_rampdown_mean.py CACHE_DIR results/units_labeled.csv results/phase7  # mean loss in the same windows
 python phase7/phase7_label_validation.py CACHE_DIR results/units_labeled.csv results/phase7  # hemisphere labels checked without light
 python phase7/phase7_referee.py CACHE_DIR results                                      # light spread, behaviour, baselines, equivalence, within-mouse
-python phase7/phase7_plot.py results
+python phase7/phase7_plot.py results; python phase7/phase7_plot2.py results
 ```
 
 ![phase7](results/phase7/fig_phase7.png)
+![phase7b](results/phase7/fig_phase7b.png)
 
 | Audit | Outcome |
 | --- | --- |
