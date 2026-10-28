@@ -110,5 +110,35 @@ Limitations: the receiving ceiling is underestimated (a third of the trials); th
 from within-trial residuals in 100-ms bins (pCCA-FA, McDonnell et al. 2026, not yet run); a small direct effect
 of scattered light on the other hemisphere cannot be fully excluded.
 
-Next (Phase 3): a model of B driven by a low-rank, delayed, gated link from A — find the minimal link that
-reproduces both control-trial activity and the response/recovery after silencing.
+## Phase 3 — the minimal virtual callosal link
+
+```
+python phase3/phase3_link.py CACHE_DIR results/units_labeled.csv results/phase2/phase2_pairs.csv results/phase3
+python phase3/phase3_plot.py results/phase3
+```
+
+Linear model of hemisphere B in its top 20 PCs, 100-ms steps:
+y_B(t) = M y_B(t−1) + o(t, c) + g(t) W y_A(t−L), rank(W) ≤ d. Trained on half of the trials, tested on the other
+half by running the model forward from delay onset driven only by A's observed activity, and scoring how well it
+predicts B's response to silencing A (noise-corrected R², denominator from two disjoint halves of the test trials).
+Bit rate = d × bits × 10 Hz after uniform quantisation of the d link signals.
+
+![phase3](results/phase3/fig_phase3_link.png)
+
+| Finding | Median of 266 hemisphere pairs |
+| --- | --- |
+| **A link learned from control trials alone does not predict the silencing response** | R² ≈ 0, and worse with more dimensions (−0.16 at d = 10) |
+| In control trials the link is nearly invisible | one-step R² gain 0.005, versus a gain of 0.32 in the silencing response |
+| Trained with silencing trials, the full-rank link predicts the response | R² 0.38 (laser on), 0.29 (after) |
+| **The link should run along the receiving subspace** | 3 dims along it: 0.44, better than full rank (p = 2e-14); 3 best-predicting dims: 0.20 (difference 0.21, p = 3e-40) |
+| The link must be fast | delay 100 / 200 / 300 ms: 0.38 / 0.29 / 0.22 |
+| **Gating does not help (H3/H4 not supported)** | two-state gate (Chen et al.) = fixed (p = 0.31); precision gate slightly worse (−0.01), weakest κ always chosen |
+| **About 90 bit/s suffices** | receiving subspace, 3 dims × 3 bits × 10 Hz: 0.43 (unquantised 0.44); 2 bits: −0.03 |
+
+Reading: correlations alone cannot calibrate a callosal link — the link is almost invisible in normal trials;
+perturbation data are required. A link of 3 dimensions along the receiving subspace, ≤ 100 ms delay and ~90 bit/s
+reproduced the silencing response as well as a full-rank link, without any gating. (This is for ~40 recorded
+neurons per side summarised by 20 PCs, not an estimate of the capacity of the whole corpus callosum.)
+
+Limitations: linear model (no attractor dynamics); unknown ceiling for R²; recovery after the laser is captured
+less well (0.29) than the laser epoch; per-animal specifications (modular vs asymmetric) not yet separated.
