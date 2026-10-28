@@ -94,6 +94,11 @@ McDonnell ら（Nat Commun 2026）は、サル前頭前野の左右で共有さ�
 瞳孔径で測った**覚醒度**と連動していることを示した。
 相関だけを見ると、共通入力を「半球間の通信」と誤認する。片方の口をふさぐ＝**片側を光で止める**ことで初めて区別できる。
 
+同じ問題は人の分離脳の議論にも出てくる。Pinto ら（*Trends Cogn Sci* 21:835–851, 2017）は、脳梁がなくても左右が**共通の入力を受け、共通の出力を出していれば**機能的には一つにまとまりうると論じた。
+傍証として、分離脳患者でも安静時の左右の脳活動が同期していた例（Uddin ら, *NeuroReport* 19:703–709, 2008）を挙げている。
+一方で、完全な脳梁切断の後には左右の同期が大きく失われたという報告もある（Johnston ら, *J Neurosci* 28:6453–6458, 2008）。
+人では「どこまでが脳梁経由か」を因果的に切り分けにくい。マウスの片側抑制データは、それを切り分けられる数少ない材料である。
+
 ### 1.9 通信部分空間と低ランク回帰
 
 領域Aの活動 $X$ から領域Bの活動 $Y$ を線形回帰で予測するとき、係数行列 $B$ のランクを $d$ 以下に制限する。
@@ -193,6 +198,13 @@ Chen 2021 は受け手の状態だけを2値で扱った。H4 は二つの**新�
 Chen 2021 の図1、つまり左右の選択軸の軌跡が試行ごとに強く相関することを、自分のコードで再現する。
 これが再現できれば、Phase 0 のラベルが正しいことの強い証拠になる。
 
+あわせて、**左右の「決定」の一致率**を、正答試行と誤答試行に分けて求める。
+各試行の遅延期の終わりに、左右それぞれの選択軸から「左を選ぶか右を選ぶか」を読み出し、両者が一致する割合を出す。
+正答試行では、刺激が共通なので一致して当然である。意味があるのは**誤答試行**だ。
+間違えるときにも左右がそろって同じ方向に間違えるなら、刺激という共通入力だけでは説明できない「決定の共有」がある。
+これは de Haan ら（*Neuropsychol Rev* 30:224–233, 2020）が人の分離脳に提案した「左右に自由に選ばせて一致するかを見る」検査の、マウス版に当たる。
+片側抑制の試行で一致率がどう変わるかも、Phase 2 の手がかりになる。
+
 ### Phase 2：相関部分空間と受信部分空間を比べる（本題）
 
 1. **相関部分空間**：対照試行の遅延期の活動に、低ランク回帰（Semedo 2019）と pCCA-FA（McDonnell 2026 の公開コード https://github.com/SmithLabNeuro/pcca_fa ）をかける。
@@ -253,7 +265,7 @@ $B$ は送る信号の帯域（Hz）である。たとえば $d=3$、$B=10$ Hz�
 | フェーズ | 内容 | 完了の判定 | 状態 |
 | --- | --- | --- | --- |
 | 0 | 左右ラベルと光抑制番号の復元 | 92%のユニットに左右ラベル。番号3＝両側を確認 | 完了 |
-| 1 | Chen 2021 図1の再現 | 左右の選択軸の終点が、試行ごとに有意に相関する | 未着手 |
+| 1 | Chen 2021 図1の再現と、誤答試行での左右の決定の一致率 | 左右の選択軸の終点が、試行ごとに有意に相関する | 未着手 |
 | 2 | 相関部分空間と受信部分空間の主角 | 全セッションで主角を推定し、交差検証で安定 | 未着手 |
 | 3 | 仮想BMIで最小仕様 | 仕様表が個体ごとに埋まる | 未着手 |
 | 4 | まとめと先生への連絡 | README・図・メール | 未着手 |
@@ -272,4 +284,8 @@ $B$ は送る信号の帯域（Hz）である。たとえば $d=3$、$B=10$ Hz�
 - Santander T ほか. Full interhemispheric integration sustained by a fraction of posterior callosal fibers. *PNAS* **122**(43), e2520190122 (2025). https://doi.org/10.1073/pnas.2520190122
 - Ernst MO, Banks MS. Humans integrate visual and haptic information in a statistically optimal fashion. *Nature* **415**, 429–433 (2002). https://doi.org/10.1038/415429a
 - Huo H ほか. Interhemispheric multisensory perception and Bayesian causal inference. *iScience* **26**, 106706 (2023). https://doi.org/10.1016/j.isci.2023.106706
+- Pinto Y, de Haan EHF, Lamme VAF. The split-brain phenomenon revisited: a single conscious agent with split perception. *Trends Cogn Sci* **21**(11), 835–851 (2017). https://doi.org/10.1016/j.tics.2017.09.003
+- de Haan EHF ほか. Split-brain: what we know now and why this is important for understanding consciousness. *Neuropsychol Rev* **30**(2), 224–233 (2020). https://doi.org/10.1007/s11065-020-09439-3
+- Uddin LQ ほか. Residual functional connectivity in the split-brain revealed with resting-state functional MRI. *NeuroReport* **19**(7), 703–709 (2008). https://doi.org/10.1097/WNR.0b013e3282fb8203
+- Johnston JM ほか. Loss of resting interhemispheric functional connectivity after complete section of the corpus callosum. *J Neurosci* **28**(25), 6453–6458 (2008). https://doi.org/10.1523/JNEUROSCI.0573-08.2008
 - Saeedi A, …, Watanabe M. Brightness illusions drive a neuronal response in the primary visual cortex under top-down modulation. *Nat Commun* **15**, 3141 (2024). https://doi.org/10.1038/s41467-024-46885-6
