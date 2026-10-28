@@ -46,5 +46,34 @@ Which code is *left*: the laser-site metadata lists the coordinates in the order
 type 2 = right ALM. This is not yet confirmed independently. The planned analyses are symmetric
 in the two hemispheres, so they do not depend on it.
 
-Next (Phase 1): reproduce Chen et al. 2021 Fig. 1 (correlated choice-decoder trajectories across
-hemispheres) with these labels, as a check that the labels are right.
+## Phase 1 — reproduce Chen et al. 2021 Fig. 1, and look at error trials
+
+```
+python phase1/cache_counts.py CACHE_DIR                      # 50-ms spike counts aligned to the go cue (~110 MB)
+python phase1/phase1_cd.py CACHE_DIR results/units_labeled.csv results/phase1
+python phase1/phase1_plot.py results/phase1
+```
+
+Choice decoder (CD) per hemisphere = mean over the delay of (mean rate on "lick right" − "lick left" correct
+trials), as in Chen et al.; 400-ms windows; 2-fold cross-validation so every correct trial is projected with a
+CD that did not see it. Endpoint = last 400 ms before the go cue. Control trials only (no photostimulation,
+no early lick, normal 1.7-s delay). Only Phase-0-labeled pyramidal units (median 33 in the smaller hemisphere;
+Chen et al. averaged 71 neurons per hemisphere).
+
+![phase1](results/phase1/fig_phase1_cd.png)
+
+| Finding | Value (133 sessions) |
+| --- | --- |
+| Endpoints correlate between hemispheres within a trial type (Fig. 1G) | Spearman ρ 0.26 ("lick right"), 0.27 ("lick left"), 0.55 (both types); shuffled ≈ 0; within-type vs shuffled p = 7e-20 |
+| The two hemispheres predict the same choice (Fig. 1H) | 74% of held-out correct trials; each hemisphere predicts the lick on 80–81% |
+| The shortfall versus Chen et al. is explained by neuron count | ρ and agreement rise with the number of labeled units (Spearman 0.54, p = 3e-11); sessions with ≥ 60 units in both hemispheres: agreement 83%, ≥ 80 units: 89% |
+| The correlation rises over the trial (Fig. S1H) | within-type ρ 0.14 before the sample epoch → 0.28 in the late delay → 0.07 after the go cue |
+| The pre-sample correlation is not slow drift across the session | removing a ±10-trial running mean leaves it at 0.13 |
+| **New:** on error trials the hemispheres make the same mistake more often than chance | agreement 61% vs 53% expected if independent given the trial type (p = 8e-12, 5,833 error trials); both predict the wrong (actual) lick on 38% of errors, both the instructed side on 23% |
+
+Reading: about half of the late-delay correlation (ρ ≈ 0.14 of 0.28) is already present before the stimulus,
+i.e. it is shared fluctuation that is not about the choice — a candidate for common input such as arousal
+(McDonnell et al. 2026). Separating that part from what one hemisphere actually sends the other is Phase 2.
+
+Next (Phase 2): correlated subspace (reduced-rank regression, pCCA-FA) versus receiving subspace (effect of
+unilateral photoinhibition on the other hemisphere), and the angles between them.

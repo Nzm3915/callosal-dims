@@ -10,6 +10,7 @@ from scipy.stats import wilcoxon
 D = sys.argv[1]
 df = pd.read_csv(os.path.join(D, 'phase1_sessions.csv'))
 rt = np.load(os.path.join(D, 'phase1_rho_time.npy'))
+rt_dt = np.load(os.path.join(D, 'phase1_rho_time_detrended.npy'))
 t_end = np.load(os.path.join(D, 'phase1_t_end.npy'))
 ex = np.load(os.path.join(D, 'phase1_example.npz'), allow_pickle=True)
 
@@ -52,9 +53,11 @@ a = ax[0, 2]
 tc = t_end - 0.2
 m, s = np.nanmean(rt, 0), np.nanstd(rt, 0) / np.sqrt(np.sum(~np.isnan(rt), 0))
 a.fill_between(tc, m - s, m + s, color=INK, alpha=0.15, linewidth=0)
-a.plot(tc, m, color=INK, lw=2)
-for x, lab in ((-3.0, 'sample'), (-1.7, 'delay'), (0, 'go')):
-    a.axvline(x, color=GRID, lw=1, zorder=0); a.text(x + 0.05, a.get_ylim()[1] if False else 0.0, '', fontsize=7)
+a.plot(tc, m, color=INK, lw=2, label='raw')
+a.plot(tc, np.nanmean(rt_dt, 0), color=BLUE, lw=2, ls='--', label='slow drift removed')
+a.legend(frameon=False, fontsize=7, loc='lower left')
+for x in (-3.0, -1.7, 0):
+    a.axvline(x, color=GRID, lw=1, zorder=0)
 a.axhline(0, color=GRID, lw=1, zorder=0)
 a.set_xlabel('time from go cue (s), 400-ms window centre'); a.set_ylabel('within-type ρ (mean ± s.e.m.)')
 a.set_title('C  Correlation develops over the trial')
@@ -89,7 +92,7 @@ a.set_title(f'E  Error trials: hemispheres err together\n(n={len(e)} sessions wi
 # F: correlation vs number of labeled units (sanity)
 a = ax[1, 2]
 n = np.minimum(df.nA, df.nB)
-r = df[['rho_R', 'rho_L']].mean(1)
+r = df[['rho_R', 'rho_L']].mean(axis=1)
 a.scatter(n, r, s=12, color=INK, alpha=0.55, linewidths=0)
 a.set_xlabel('labeled units in the smaller hemisphere'); a.set_ylabel('within-type ρ (mean of R, L)')
 a.axhline(0, color=GRID, lw=1, zorder=0)

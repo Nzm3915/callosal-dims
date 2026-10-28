@@ -53,6 +53,18 @@ def cd_vector(r, isR, delay_w):
     return v / n if n > 0 else v
 
 
+def detrend(x, half=10):
+    """Remove slow drift across the session: subtract the mean of the neighbouring trials
+    (up to `half` on each side, the trial itself excluded). x: trials (in session order) x windows."""
+    out = np.empty_like(x)
+    n = len(x)
+    for i in range(n):
+        lo, hi = max(0, i - half), min(n, i + half + 1)
+        nb = np.r_[lo:i, i + 1:hi]
+        out[i] = x[i] - x[nb].mean(0)
+    return out
+
+
 def boundary(pR, pL):
     vR, vL = pR.var() + 1e-9, pL.var() + 1e-9
     return (pR.mean() / vR + pL.mean() / vL) / (1 / vR + 1 / vL)
@@ -110,12 +122,21 @@ def analyse(d):
         res[f'rho_{name}_withErr'] = spearmanr(eA[ta], eB[ta])[0]
     res['rho_both'] = spearmanr(eA[corr_tr], eB[corr_tr])[0]
     res['rho_both_shuf'] = spearmanr(eA[corr_tr], rng.permutation(eB[corr_tr]))[0]
-    # correlation over time, within trial type (average of R and L)
-    rt = []
+    # correlation over time, within trial type (average of R and L); raw and after removing slow drift
+    rt, rt_dt = [], []
+    dt = {}
+    for s in (True, False):
+        t = corr_tr[isR_all[corr_tr] == s]                     # already in session order
+        dt[s] = (detrend(proj['A'][t]), detrend(proj['B'][t]))
     for w in range(len(t_end)):
         vals = [spearmanr(proj['A'][corr_tr[isR_all[corr_tr] == s], w],
                           proj['B'][corr_tr[isR_all[corr_tr] == s], w])[0] for s in (True, False)]
         rt.append(np.nanmean(vals))
+        rt_dt.append(np.nanmean([spearmanr(dt[s][0][:, w], dt[s][1][:, w])[0] for s in (True, False)]))
+    res['rho_R_dt'] = spearmanr(dt[True][0][:, end_w], dt[True][1][:, end_w])[0]
+    res['rho_L_dt'] = spearmanr(dt[False][0][:, end_w], dt[False][1][:, end_w])[0]
+    pre_w = int(np.argmin(np.abs(t_end - (-3.0))))             # window ending at sample onset (pre-sample)
+    res['rho_pre'] = rt[pre_w]; res['rho_pre_dt'] = rt_dt[pre_w]
     # agreement and choice prediction
     pa, pb = pred('A', corr_tr), pred('B', corr_tr)
     lick = d['lickR'][corr_tr]
@@ -137,7 +158,7 @@ def analyse(d):
         res['n_err_agree'] = int((ea == eb).sum())
         res['n_err_both_actual'] = int(((ea == le) & (eb == le)).sum())
         res['n_err_both_instructed'] = int(((ea != le) & (eb != le)).sum())
-    ex = dict(t_end=t_end, rt=np.array(rt), projA=proj['A'], projB=proj['B'], corr_tr=corr_tr, err_tr=err_tr,
+    ex = dict(t_end=t_end, rt=np.array(rt), rt_dt=np.array(rt_dt), projA=proj['A'], projB=proj['B'], corr_tr=corr_tr, err_tr=err_tr,
               instR=isR_all, end_w=end_w)
     return res, ex
 
@@ -145,19 +166,20 @@ def analyse(d):
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     lab = pd.read_csv(LABELS)
-    rows, ts, examples = [], [], {}
+    rows, ts, ts_dt, examples = [], [], [], {}
     for p in sorted(glob.glob(os.path.join(CACHE, '*.npz'))):
         res, ex = analyse(load(p, lab))
         if res is None: continue
-        rows.append(res); ts.append(ex['rt']); examples[res['session']] = ex
+        rows.append(res); ts.append(ex['rt']); ts_dt.append(ex['rt_dt']); examples[res['session']] = ex
     df = pd.DataFrame(rows)
     df.to_csv(os.path.join(OUT, 'phase1_sessions.csv'), index=False)
     np.save(os.path.join(OUT, 'phase1_rho_time.npy'), np.array(ts))
+    np.save(os.path.join(OUT, 'phase1_rho_time_detrended.npy'), np.array(ts_dt))
     np.save(os.path.join(OUT, 'phase1_t_end.npy'), ex['t_end'])
     # keep the example with the most units for plotting
     best = df.assign(n=df.nA + df.nB).sort_values('n').session.iloc[-1]
     np.savez(os.path.join(OUT, 'phase1_example.npz'), session=best, **examples[best])
     print(len(df), 'sessions')
-    print(df[['rho_R', 'rho_L', 'rho_both', 'rho_R_shuf', 'rho_L_shuf', 'rho_both_shuf',
+    print(df[['rho_R', 'rho_L', 'rho_R_dt', 'rho_L_dt', 'rho_pre', 'rho_pre_dt', 'rho_both', 'rho_R_shuf', 'rho_L_shuf', 'rho_both_shuf',
               'agree_corr', 'predA_corr', 'predB_corr', 'agree_err', 'agree_err_indep',
               'predA_err', 'predB_err']].describe().round(3).T[['count', 'mean', '50%', 'std']])
