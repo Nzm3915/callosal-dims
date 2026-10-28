@@ -27,6 +27,10 @@ and review.
 - Tested a dozen mechanistic hypotheses with pre-stated failure criteria (gates, attractors, ramping input, partner
   loss, inhibitory gain, circuit models); found that the state dependence of the callosal effect is partly explained
   by single-neuron gain loss (Phase 6–7).
+- For the quantum-brain project, bounded the radical-pair route for the xenon isotope effect with a spin-dynamics
+  model and an all-electron DFT estimate of the ¹²⁹Xe–radical hyperfine coupling (`quantum/`): ~1–2 mT next to a
+  localised radical, but only 0.1–0.2 mT for the delocalised π radicals biology offers, too weak for the reported
+  effect.
 - Ran a self-auditing loop over all results (mouse-level statistics, unbiased ceilings, null models for each claim)
   and published the corrections it forced ([docs/00_review_log.md](docs/00_review_log.md)).
 
