@@ -14,3 +14,4 @@ sub-BAYLORGC93/sub-BAYLORGC93_ses-20191129_ecephys+ogen.nwb pa 2 delays 9.9;-35.
 sub-BAYLORGC94/sub-BAYLORGC94_ses-20191206_ecephys+ogen.nwb pa 0 delays  180s
 sub-BAYLORGC96/sub-BAYLORGC96_ses-20200123_ecephys+ogen.nwb pa 0 delays  304s
 sub-BAYLORGC96/sub-BAYLORGC96_ses-20200130_ecephys+ogen.nwb pa 0 delays  216s
+sub-BAYLORGC99/sub-BAYLORGC99_ses-20191227_ecephys+ogen.nwb pa 0 delays  210s

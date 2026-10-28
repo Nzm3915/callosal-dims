@@ -74,7 +74,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 from dlag_summary import read_summary
 dm = read_summary(R); dk = read_summary(os.path.join(R, 'phase7', 'dlag_keepmean'))
 check('DLAG main frac across', '88%のセッションで1つ以上', round(100 * (dm.pa > 0).mean()))
-check('DLAG keepmean frac across', '| 左右にまたがる成分が見つかるセッション | 88% | **35%** |',
+check('DLAG keepmean frac across', '| 左右にまたがる成分が見つかるセッション | 88% | **34%** |',
       round(100 * (dk.pa > 0).mean()))
 ov = pd.read_csv(os.path.join(R, 'phase7', 'dlag_keepmean', 'overlap.csv')); ovg = ov[(ov.rel_den > 0) & (ov.pa > 0)]
 check('DLAG keepmean overlap', '| 見つかったときの、止めたときの反応との重なり | 0.20 | **0.13** |',
