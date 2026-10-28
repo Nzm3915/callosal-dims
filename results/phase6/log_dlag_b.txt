@@ -1,0 +1,38 @@
+sub-BAYLORGC80/sub-BAYLORGC80_ses-20190708_ecephys+ogen.nwb pa 1 delays 10.4 52s
+sub-BAYLORGC80/sub-BAYLORGC80_ses-20190710_ecephys+ogen.nwb pa 4 delays 11.9;15.8;10.1;-20.9 204s
+sub-BAYLORGC80/sub-BAYLORGC80_ses-20190711_ecephys+ogen.nwb pa 3 delays -139.8;93.0;-43.7 109s
+sub-BAYLORGC80/sub-BAYLORGC80_ses-20190712_ecephys+ogen.nwb pa 1 delays 149.9 17s
+sub-BAYLORGC80/sub-BAYLORGC80_ses-20190713_ecephys+ogen.nwb pa 2 delays -88.5;146.8 67s
+sub-BAYLORGC81/sub-BAYLORGC81_ses-20190916_ecephys+ogen.nwb pa 3 delays -27.5;-37.5;28.3 48s
+sub-BAYLORGC81/sub-BAYLORGC81_ses-20190917_ecephys+ogen.nwb pa 1 delays 10.3 44s
+sub-BAYLORGC81/sub-BAYLORGC81_ses-20190918_ecephys+ogen.nwb pa 4 delays 6.1;29.7;25.8;-26.2 122s
+sub-BAYLORGC81/sub-BAYLORGC81_ses-20190920_ecephys+ogen.nwb pa 4 delays -29.2;-7.1;45.1;31.4 126s
+sub-BAYLORGC83/sub-BAYLORGC83_ses-20190814_ecephys+ogen.nwb pa 1 delays 28.7 33s
+sub-BAYLORGC83/sub-BAYLORGC83_ses-20190815_ecephys+ogen.nwb pa 4 delays -101.4;20.2;-32.6;21.7 172s
+sub-BAYLORGC83/sub-BAYLORGC83_ses-20190817_ecephys+ogen.nwb pa 4 delays -64.8;-22.1;-27.4;44.6 131s
+sub-BAYLORGC83/sub-BAYLORGC83_ses-20190819_ecephys+ogen.nwb pa 2 delays 77.3;-30.0 134s
+sub-BAYLORGC83/sub-BAYLORGC83_ses-20190822_ecephys+ogen.nwb pa 4 delays -27.3;-143.9;-14.8;14.5 200s
+sub-BAYLORGC84/sub-BAYLORGC84_ses-20190716_ecephys+ogen.nwb pa 0 delays  20s
+sub-BAYLORGC84/sub-BAYLORGC84_ses-20190717_ecephys+ogen.nwb pa 2 delays -33.4;47.1 35s
+sub-BAYLORGC84/sub-BAYLORGC84_ses-20190718_ecephys+ogen.nwb pa 0 delays  14s
+sub-BAYLORGC84/sub-BAYLORGC84_ses-20190719_ecephys+ogen.nwb pa 3 delays 20.1;134.4;148.8 40s
+sub-BAYLORGC84/sub-BAYLORGC84_ses-20190723_ecephys+ogen.nwb pa 4 delays -1.1;-45.0;-1.0;-21.8 124s
+sub-BAYLORGC84/sub-BAYLORGC84_ses-20190725_ecephys+ogen.nwb pa 2 delays -1.9;-4.5 164s
+sub-BAYLORGC85/sub-BAYLORGC85_ses-20190802_ecephys+ogen.nwb pa 4 delays -59.9;26.6;-2.6;-91.1 193s
+sub-BAYLORGC85/sub-BAYLORGC85_ses-20190805_ecephys+ogen.nwb pa 4 delays -40.3;-23.6;-55.9;-86.6 144s
+sub-BAYLORGC85/sub-BAYLORGC85_ses-20190808_ecephys+ogen.nwb pa 2 delays 30.1;-46.4 26s
+sub-BAYLORGC86/sub-BAYLORGC86_ses-20190725_ecephys+ogen.nwb pa 4 delays -9.5;8.1;2.2;4.3 93s
+sub-BAYLORGC86/sub-BAYLORGC86_ses-20190726_ecephys+ogen.nwb pa 3 delays -90.9;-3.8;0.8 84s
+sub-BAYLORGC86/sub-BAYLORGC86_ses-20190727_ecephys+ogen.nwb pa 0 delays  14s
+sub-BAYLORGC86/sub-BAYLORGC86_ses-20190731_ecephys+ogen.nwb pa 1 delays 17.4 53s
+sub-BAYLORGC86/sub-BAYLORGC86_ses-20190801_ecephys+ogen.nwb pa 4 delays -15.9;5.2;-6.2;-7.2 208s
+sub-BAYLORGC87/sub-BAYLORGC87_ses-20190909_ecephys+ogen.nwb pa 4 delays -5.1;19.0;3.9;-61.5 116s
+sub-BAYLORGC87/sub-BAYLORGC87_ses-20190910_ecephys+ogen.nwb pa 1 delays -15.0 119s
+sub-BAYLORGC87/sub-BAYLORGC87_ses-20190912_ecephys+ogen.nwb pa 4 delays -46.1;19.6;-1.9;-0.2 174s
+sub-BAYLORGC87/sub-BAYLORGC87_ses-20190913_ecephys+ogen.nwb pa 3 delays 41.0;18.8;8.1 168s
+sub-BAYLORGC88/sub-BAYLORGC88_ses-20190826_ecephys+ogen.nwb pa 2 delays -2.8;12.1 143s
+sub-BAYLORGC88/sub-BAYLORGC88_ses-20190827_ecephys+ogen.nwb pa 4 delays -45.9;-28.9;57.4;75.8 205s
+sub-BAYLORGC89/sub-BAYLORGC89_ses-20190926_ecephys+ogen.nwb pa 4 delays -4.3;24.1;7.3;-97.1 120s
+sub-BAYLORGC89/sub-BAYLORGC89_ses-20190927_ecephys+ogen.nwb pa 4 delays 45.8;29.0;-48.5;-0.2 171s
+sub-BAYLORGC89/sub-BAYLORGC89_ses-20190930_ecephys+ogen.nwb pa 4 delays 18.9;11.8;-39.8;-64.3 157s
+sub-BAYLORGC90/sub-BAYLORGC90_ses-20191118_ecephys+ogen.nwb pa 4 delays 4.3;-23.6;6.4;-7.4 231s

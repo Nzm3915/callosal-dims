@@ -3,10 +3,36 @@
 What does the corpus callosum carry? Separating interhemispheric communication from common drive
 with unilateral silencing in mouse ALM, toward the minimal specification of a callosal BMI.
 
+## Author
+
+**Lan Zhenlin (藍振臨) — [@Nzm3915](https://github.com/Nzm3915)**, Electrical & Electronic Engineering, Korea University.
+
+Project lead. Turned a proposal for a callosal brain–machine interface (Watanabe, *意識の脳科学*, 2024) into a
+measurable engineering question — *what is the minimal specification of the link between two hemispheres?* —
+and drove the research end to end: set the goals of each phase, chose which questions and hypotheses to pursue
+and which to drop, selected and supplied the literature (including the book chapters behind the project),
+proposed the quantum-brain hypothesis that docs/03 decomposes and tests, and carried the results into the
+follow-up master's plan. Analysis code was written with an AI pair-programmer (Claude Code) under his direction
+and review.
+
+**Highlights**
+
+- Recovered the hemisphere labels that the public data set does not record (Phase 0), then showed on 133 sessions
+  / 39 mice that the directions along which the two hemispheres co-fluctuate carry only 14% of what one hemisphere
+  actually sends the other (Phase 2).
+- A virtual BMI fitted to the data: ~3 dimensions, ≤100 ms, ~90 bit/s reproduce the interhemispheric influence —
+  but only when calibrated with perturbation data; links learned from normal activity predict nothing (Phase 3).
+- Re-implemented DLAG (Gokcen et al. 2022) in PyTorch with exact-gradient marginal-likelihood fitting, and used it
+  to test whether the best correlation-based method can recover the causal channel (Phase 6).
+- Tested a dozen mechanistic hypotheses with pre-stated failure criteria (gates, attractors, ramping input, partner
+  loss, inhibitory gain, circuit models); found that the state dependence of the callosal effect is partly explained
+  by single-neuron gain loss (Phase 6).
+
 ## Documents (Japanese)
 
 - [docs/01_mouse_callosal_dims.md](docs/01_mouse_callosal_dims.md) — background, questions, phases and results of this project
 - [docs/03_bold_hypotheses.md](docs/03_bold_hypotheses.md) — bold hypotheses (incl. quantum-brain and shared-consciousness claims) turned into algorithms and tested on this data
+- [docs/04_quantum_cellular_project.md](docs/04_quantum_cellular_project.md) — design of a cell-level test of quantum effects in neural function (nuclear-spin isotope ladder)
 - Follow-up master's research plan (split-brain world models): [Nzm3915/split-brain-world-models](https://github.com/Nzm3915/split-brain-world-models)
 
 Data: [DANDI 000894](https://dandiarchive.org/dandiset/000894) — simultaneous bilateral ALM recordings
@@ -208,6 +234,34 @@ not what matters for behaviour; and the choice-axis state dependence is neither 
 attractor — a change of gain (via inhibition) is the remaining candidate. Next steps and the reading list are in
 docs/01 sections 6–7.
 
+## Phase 6 — the remaining puzzle, with the literature's tests and a new hypothesis
+
+```
+python phase6/phase6_modes.py CACHE_DIR results/units_labeled.csv results/phase6       # 6-1 modes (Finkelstein, Inagaki, Economo)
+python phase6/phase6_ramp.py CACHE_DIR results/units_labeled.csv results/phase6        # 6-2 ramping mode as gain carrier
+python phase6/phase6_partner.py CACHE_DIR results/units_labeled.csv results/phase6     # 6-2b partner loss (errors in variables)
+python phase6/phase6_fsgain.py CACHE_DIR results results/phase6                        # 6-3 FS rate as gain carrier (B2')
+python phase6/phase6_neurongain.py CACHE_DIR results/units_labeled.csv results/phase6  # 6-4 single-neuron gain (new)
+python phase6/phase6_dlag.py CACHE_DIR results/units_labeled.csv results/phase6        # 6-5 DLAG (PyTorch re-implementation)
+python phase6/phase6_dlag_analysis.py CACHE_DIR results
+python phase6/phase6_rewrite.py CACHE_DIR results/units_labeled.csv results/phase6     # 6-6 is A rewritten from B?
+python hypotheses/h5b_circuit.py results                                               # B5' circuit with heterogeneity + adaptation
+python phase6/phase6_plot.py results
+```
+
+![phase6](results/phase6/fig_phase6.png)
+
+| Question | Answer |
+| --- | --- |
+| Which of the receiver's modes carries the callosal response? (choice / ramping mode, Finkelstein 2021, Inagaki 2019; early / late / go CDs, Economo 2018) | None: the top receiving direction holds 74% of the reliable response; choice mode 4.9%, ramping mode 5.8–8.0%, all three non-selective modes 19%, Economo's CDs 2–4% (random 1-D: 2.4%). B's own variance along it is 1.26× a random direction |
+| Does a stronger ramping mode protect the plan (Finkelstein Fig. 5f)? | No: stim × ramp = −0.006 (p = 0.88); behavioural error excess flat across ramp tertiles; c1 unchanged (−0.121 → −0.119) |
+| Is c1 an errors-in-variables artefact of losing a correlated partner? | No: measuring A better (0.4 → 1.2 s) leaves c1 at −0.12 to −0.13 |
+| Is B's fast-spiking rate the gain carrier (B2')? | No: FS drop to 0.62× but do not modulate persistence (f = −0.012, p = 0.68); predicted c1 = +0.006 vs −0.132 observed |
+| **New: single-neuron gain** — does each neuron lose the state it carries in proportion to its rate drop? | **Partly**: slope ratio ≈ g^1.3 for suppressed neurons (11,708 units, cross-validated); parameter-free prediction of c1 has the right sign (p = 4e-8) and ~30% of the observed size |
+| Is the silenced hemisphere rewritten from the other one? | No: after silencing, A depends *more* on its own pre-laser state (+0.058, p = 3e-5), less on B (−0.057); endpoint agreement drops 67.5% → 60.0% |
+| Circuit model with heterogeneous callosal input and adaptation (B5') | Heterogeneity predicts the held-out fractions of units going down/up (52%/28% vs data 42%/20%; 89%/1% without it). Adaptation gives a post-laser FS rebound of the right sign (+0.22) but not when the mean time courses are fitted jointly (data +0.40) |
+| Does DLAG (re-implemented in PyTorch; delays and dimensionality recovered on synthetic data) find the callosal channel in normal trials? (B4') | It finds across-hemisphere latents in 88% of 126 sessions, 56% with significant delays (median 30 ms). But they hold 0.20 of the silencing response (receiving subspace of the same size: 0.89; random 0.07), and the inferred direction of flow does not match the causal asymmetry measured by silencing (ρ = -0.03, p = 0.74) |
+
 ## Conclusion
 
 | Specification of a callosal link (ALM, delay epoch) | Result |
@@ -216,7 +270,8 @@ docs/01 sections 6–7.
 | How to learn it | from perturbation data; links fitted to normal activity alone predict nothing |
 | Delay | ≤ 100 ms |
 | Bit rate | ~90 bit/s (3 dims × 3 bits × 10 Hz), for ~40 neurons per side |
-| Gating | not needed for the bulk of the response; the choice-axis state dependence remains unexplained (not an attractor or a precision gate) |
+| Gating | not needed for the bulk of the response; the choice-axis state dependence is not a gate, attractor, ramp or inhibitory-rate gain — about 30% of it is single-neuron gain loss, so a link must preserve each neuron's operating point, not just the mean rate |
 | Where it acts | heavily on inhibitory (fast-spiking) cells, within 50 ms |
 | What to evaluate it by | preserving the choice axis, not reproducing the whole response (which does not predict behaviour) |
 | Individual calibration | needed: the leading hemisphere is a trait of the animal |
+| Memory | after silencing, a hemisphere returns to its own plan rather than copying the other: the short-term memory survives outside spiking |
