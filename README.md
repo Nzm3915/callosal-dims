@@ -314,6 +314,7 @@ python phase7/phase7_plot.py results
 | Behaviour | Early-lick rate unchanged by unilateral silencing (3.7% vs 3.6%, mouse-level p = 0.57); response starts in the first 50 ms |
 | Is the correlated subspace special? | No: B's own top-3 PCs hold 0.15 of the response (correlated 0.14, random 0.07) — the response lies outside B's usual fluctuations, shared or private |
 | "Gates are not needed" as equivalence | 2-state gate − fixed: −0.008 (95% CI −0.015 to +0.0004) against 0.38 |
+| DLAG preprocessing (does removing the per-trial mean handicap DLAG?) | No — the opposite. Refitted on 31 sessions without removing it: across-hemisphere components found in 35% of sessions instead of 88%, and they capture 0.13 of the silencing response instead of 0.20 |
 | Gain account within the same neurons (B8) | Moving the response window through the end of the laser: rates recover within 0.1 s, the state dependence ~0.1 s later, the mean loss of B's choice signal only slowly (half left after 0.5 s). The state dependence is present only while gain is reduced — not the tail of a displaced state. The simple gain formula explains ~40% of its size. B8 kept as partial |
 
 ## Conclusion
