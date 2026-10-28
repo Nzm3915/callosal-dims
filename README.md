@@ -38,6 +38,7 @@ and review.
 
 - [docs/01_mouse_callosal_dims.md](docs/01_mouse_callosal_dims.md) — background, questions, phases and results of this project
 - [docs/03_quantum_brain.md](docs/03_quantum_brain.md) — the quantum-brain hypothesis decomposed and tested, and a cell-level experiment (xenon / lithium isotopes) designed to settle the rest
+- [docs/01_referee_report.md](docs/01_referee_report.md) — self-written referee report on 01 and the analyses that answer it
 - [docs/00_review_log.md](docs/00_review_log.md) — self-improvement loop: what was doubted, how it was checked, and which conclusions were corrected
 - Follow-up master's research plan (split-brain world models): [Nzm3915/split-brain-world-models](https://github.com/Nzm3915/split-brain-world-models)
 
@@ -278,6 +279,8 @@ python phase7/phase7_committee_test.py CACHE_DIR results/units_labeled.csv resul
 python phase7/phase7_circuit_seeds.py results; python phase7/phase7_circuit_robust.py     # circuit robustness to network seeds
 python phase7/phase7_rampdown.py CACHE_DIR results/units_labeled.csv results/phase7  # gain account within the same neurons (end of the laser)
 python phase7/phase7_rampdown_mean.py CACHE_DIR results/units_labeled.csv results/phase7  # mean loss in the same windows
+python phase7/phase7_label_validation.py CACHE_DIR results/units_labeled.csv results/phase7  # hemisphere labels checked without light
+python phase7/phase7_referee.py CACHE_DIR results                                      # light spread, behaviour, baselines, equivalence, within-mouse
 python phase7/phase7_plot.py results
 ```
 
@@ -290,6 +293,11 @@ python phase7/phase7_plot.py results
 | Biased ceilings | The top receiving direction and the DLAG ceiling were estimated with the same trials used to score them. Unbiased three-way estimates: 0.51 (1 dim), 0.64 (DLAG's k); conclusions unchanged |
 | Committee readout (B1) | Disattenuated inter-hemispheric correlation of the choice state is ≥ 0.9; a single-driver null with the measured reliabilities reproduces the 'more confident side wins' excess (+0.039 vs observed +0.025). B1 downgraded to unresolved |
 | Circuit model (B5') | Not robust to network seeds; see Phase 6 table |
+| Are the hemisphere labels circular? (they come from the silencing responses) | Checked without any laser trial: strongly co-fluctuating pairs (fast, control trials) are 9x more frequent among same-label than different-label pairs on the same channel number, and only same-label pairs fall off with channel distance (36/39 mice, p = 1.5e-7) |
+| Light spread to the other hemisphere | Light drives inhibitory cells up; B's FS cells (5.8x under their own light) go down under A's light (median 0.55x; only 1.4% rise ≥ 2x) |
+| Behaviour | Early-lick rate unchanged by unilateral silencing (3.7% vs 3.6%, mouse-level p = 0.57); response starts in the first 50 ms |
+| Is the correlated subspace special? | No: B's own top-3 PCs hold 0.15 of the response (correlated 0.14, random 0.07) — the response lies outside B's usual fluctuations, shared or private |
+| "Gates are not needed" as equivalence | 2-state gate − fixed: −0.008 (95% CI −0.015 to +0.0004) against 0.38 |
 | Gain account within the same neurons (B8) | Moving the response window through the end of the laser: rates recover within 0.1 s, the state dependence ~0.1 s later, the mean loss of B's choice signal only slowly (half left after 0.5 s). The state dependence is present only while gain is reduced — not the tail of a displaced state. The simple gain formula explains ~40% of its size. B8 kept as partial |
 
 ## Conclusion
