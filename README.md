@@ -27,10 +27,12 @@ and review.
 - Tested a dozen mechanistic hypotheses with pre-stated failure criteria (gates, attractors, ramping input, partner
   loss, inhibitory gain, circuit models); found that the state dependence of the callosal effect is partly explained
   by single-neuron gain loss (Phase 6–7).
-- For the quantum-brain project, bounded the radical-pair route for the xenon isotope effect with a spin-dynamics
-  model and an all-electron DFT estimate of the ¹²⁹Xe–radical hyperfine coupling (`quantum/`): ~1–2 mT next to a
-  localised radical, but only 0.1–0.2 mT for the delocalised π radicals biology offers, too weak for the reported
-  effect.
+- For the quantum-brain project, narrowed the whole question to two measurable conditions (`quantum/`): at body
+  temperature a nuclear spin carries 10⁻¹⁰ of kT, so only a short-lived radical pair can express it; an all-electron
+  DFT scan then shows the coupling is large enough (0.36 mT averaged over orientations, up to 1.5 mT when locked),
+  which leaves the superoxide electron's spin relaxation as the one quantity that decides the answer. A screen over
+  radicals and guest nuclei refuted one of the project's own predictions (⁸³Kr keeps most of the effect despite a
+  far smaller coupling, because the effective field scales as a·√(I(I+1))).
 - Ran a self-auditing loop over all results (mouse-level statistics, unbiased ceilings, null models for each claim)
   and published the corrections it forced ([docs/00_review_log.md](docs/00_review_log.md)).
 
@@ -44,6 +46,7 @@ python quantum/xe_superoxide_curve.py results/quantum # Xe...O2*- binding curve,
 python quantum/energy_scales.py results/quantum       # kT, mass and spin energy scales at body temperature
 python quantum/xe_effect_bound.py results/quantum     # the effect size an experiment would see
 python quantum/spin_grid.py results/quantum           # the full (a, k, r, B) grid behind quantum/explorer/
+python quantum/screen.py results/quantum              # candidate table: radicals x placements x guest nuclei
 ```
 
 `quantum/explorer/index.html` is an interactive map of that grid: move the hyperfine coupling, the radical-pair
