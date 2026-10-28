@@ -1,0 +1,12 @@
+{
+ "zeeman_129Xe_50uT_over_kT": 9.180662769049778e-11,
+ "hyperfine_129Xe_1mT_over_kT": 4.3386705526157535e-06,
+ "equilibrium_mass_effect_129Xe_132Xe_k10": 8.06176171960949e-05,
+ "diffusion_ratio_129Xe_132Xe": 0.01156726640435557,
+ "equilibrium_mass_effect_132Xe_136Xe_k10": 0.00010204877243632654,
+ "diffusion_ratio_132Xe_136Xe": 0.015060482291063382,
+ "equilibrium_mass_effect_6Li_7Li_k10": 0.010838808449506018,
+ "diffusion_ratio_6Li_7Li": 0.07999902713928497,
+ "Li_transport_fractionation_NHE_max": 0.0213,
+ "Li2018_reported_potency_ratio_spin_vs_spin0": 1.45
+}

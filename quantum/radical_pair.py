@@ -1,15 +1,17 @@
-"""Radical-pair model for docs/03 section 6: how large a nuclear-spin isotope effect and magnetic-field effect could a
-xenon nucleus produce, if xenon acted through a radical pair?
+"""Radical-pair model for docs/03 section 6: how large a nuclear-spin isotope effect could a xenon nucleus produce,
+if xenon acted through a radical pair?
 
-System: two electron spins S1, S2 (the radical pair, born as a singlet) and one xenon nucleus I coupled to S1 by an
-isotropic hyperfine interaction a (in mT). Hamiltonian (angular frequency units):
-    H = gamma_e B (S1z + S2z) + a_rad * I . S1
-Spin-selective recombination with rate k (Haberkorn model, equal singlet and triplet rates). Singlet yield
-    Phi_S = (1 / Z) sum_{m,n} |<m|P_S|n>|^2 k^2 / (k^2 + w_mn^2),   Z = 2I + 1,
-where |m> are eigenstates of H, w_mn their energy differences and P_S the singlet projector.
-Isotopes: 129Xe (I = 1/2), 131Xe (I = 3/2, gyromagnetic ratio -0.297 x that of 129Xe, so a_131 = -0.297 a_129),
-spin-0 isotopes (I = 0, no hyperfine term).
-The hyperfine constant of xenon with a protein/oxygen radical is not known; it is scanned (0.05-5 mT), as is k.
+Correction (2026-10-29, second pass): the first version used the electron gyromagnetic ratio 1.76e8 rad/s/T
+instead of 1.76e11 rad/s/T, which made every hyperfine and Zeeman frequency 1000x too small, so the isotope effects
+only appeared at absurdly long lifetimes (10 us). Fixed here; all numbers in docs/03 were recomputed.
+
+System: electrons S1, S2 (born as a singlet); a xenon nucleus I on S1 (isotropic hyperfine a); one spin-1/2 nucleus
+of the partner radical on S2 (a_bg, the partner's own hyperfine field, which mixes singlet and triplet even without
+xenon). H = gamma_e B (S1z + S2z) + a I.S1 + a_bg J.S2   (frequencies: a [mT] * gamma_e).
+Recombination: Haberkorn, equal singlet/triplet rate k -> d rho/dt = -i[H, rho] - k rho + relaxation.
+Relaxation: random-field relaxation of electron 1 at rate r (Lindblad operators sqrt(r) * S1x, S1y, S1z); r = 0 gives
+the coherent limit. Singlet yield Phi_S = k Tr(P_S (k - L)^-1 rho0), rho0 = P_S / Z (nuclei unpolarised).
+Isotopes: 129Xe (I = 1/2, gamma -7.452e7), 131Xe (I = 3/2, gamma +2.209e7 -> a_131 = -0.2964 a_129), spin-0 isotopes.
 
 usage: python radical_pair.py OUTDIR
 """
@@ -17,100 +19,96 @@ import sys, os, json, numpy as np
 import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else 'results/quantum'
-GAMMA_E = 1.76085963e8        # rad s^-1 T^-1 (electron, g ~ 2)
+GAMMA_E = 1.76085963e11       # rad s^-1 T^-1 (free electron)
+R131 = 2.209e7 / -7.452e7     # a_131 / a_129
 sx = np.array([[0, 1], [1, 0]]) / 2; sy = np.array([[0, -1j], [1j, 0]]) / 2; sz = np.array([[1, 0], [0, -1]]) / 2
 
 
 def spin_ops(I):
+    if I == 0:
+        return [np.zeros((1, 1))] * 3
     d = int(round(2 * I + 1)); m = I - np.arange(d)
-    Iz = np.diag(m); Ip = np.zeros((d, d))
+    Iz = np.diag(m).astype(complex); Ip = np.zeros((d, d), complex)
     for i in range(1, d):
         Ip[i - 1, i] = np.sqrt(I * (I + 1) - m[i] * (m[i] + 1))
-    return (Ip + Ip.T) / 2, (Ip - Ip.T) / (2j), Iz
+    return [(Ip + Ip.T) / 2, (Ip - Ip.T) / (2j), Iz]
 
 
-def singlet_yield(I, a_mT, B_mT, k, a_bg_mT=0.0):
-    """a_bg_mT: isotropic hyperfine of one spin-1/2 nucleus (e.g. a proton) of the partner radical on S2 - the
-    radical's own nuclei mix singlet and triplet even without xenon"""
-    if a_bg_mT:
-        return _yield_bg(I, a_mT, B_mT, k, a_bg_mT)
-    e2 = np.eye(2)
-    if I == 0:
-        dI = 1; Ix = Iy = Iz = np.zeros((1, 1))
-    else:
-        Ix, Iy, Iz = spin_ops(I); dI = Ix.shape[0]
-    eI = np.eye(dI)
-    kron = lambda a, b, c: np.kron(np.kron(a, b), c)
-    S1 = [kron(s, e2, eI) for s in (sx, sy, sz)]; S2 = [kron(e2, s, eI) for s in (sx, sy, sz)]
-    Iv = [kron(e2, e2, o) for o in (Ix, Iy, Iz)]
-    a = a_mT * 1e-3 * GAMMA_E; w = B_mT * 1e-3 * GAMMA_E
-    H = w * (S1[2] + S2[2]) + (a * sum(S1[i] @ Iv[i] for i in range(3)) if I else 0)
-    S1S2 = sum(S1[i] @ S2[i] for i in range(3))
-    PS = 0.25 * np.eye(4 * dI) - S1S2
-    E, V = np.linalg.eigh(H)
-    P = V.conj().T @ PS @ V
-    dw = E[:, None] - E[None, :]
-    return float(np.real(np.sum(np.abs(P) ** 2 * k ** 2 / (k ** 2 + dw ** 2))) / dI)
+def kron(*m):
+    out = m[0]
+    for x in m[1:]:
+        out = np.kron(out, x)
+    return out
 
 
-def _yield_bg(I, a_mT, B_mT, k, a_bg_mT):
-    e2 = np.eye(2)
-    ops = [spin_ops(I) if I else (np.zeros((1, 1)),) * 3, spin_ops(0.5)]
-    dI = ops[0][0].shape[0]; eI = np.eye(dI)
-    def K(*m):
-        out = m[0]
-        for x in m[1:]: out = np.kron(out, x)
-        return out
-    S1 = [K(s, e2, eI, e2) for s in (sx, sy, sz)]; S2 = [K(e2, s, eI, e2) for s in (sx, sy, sz)]
-    Ix = [K(e2, e2, o, e2) for o in ops[0]]; Jn = [K(e2, e2, eI, o) for o in ops[1]]
-    a = a_mT * 1e-3 * GAMMA_E; ab = a_bg_mT * 1e-3 * GAMMA_E; w = B_mT * 1e-3 * GAMMA_E
-    H = w * (S1[2] + S2[2]) + ab * sum(S2[i] @ Jn[i] for i in range(3))
-    if I: H = H + a * sum(S1[i] @ Ix[i] for i in range(3))
+def system(I, a_mT, B_mT, a_bg_mT):
+    Ix = spin_ops(I); dI = Ix[0].shape[0]; e2, eI = np.eye(2), np.eye(dI)
+    S1 = [kron(s, e2, eI, e2) for s in (sx, sy, sz)]; S2 = [kron(e2, s, eI, e2) for s in (sx, sy, sz)]
+    Iv = [kron(e2, e2, o, e2) for o in Ix]; Jv = [kron(e2, e2, eI, s) for s in (sx, sy, sz)]
+    w = B_mT * 1e-3 * GAMMA_E; a = a_mT * 1e-3 * GAMMA_E; ab = a_bg_mT * 1e-3 * GAMMA_E
+    H = w * (S1[2] + S2[2]) + ab * sum(S2[i] @ Jv[i] for i in range(3))
+    if I:
+        H = H + a * sum(S1[i] @ Iv[i] for i in range(3))
     PS = 0.25 * np.eye(H.shape[0]) - sum(S1[i] @ S2[i] for i in range(3))
-    E, V = np.linalg.eigh(H); P = V.conj().T @ PS @ V; dw = E[:, None] - E[None, :]
-    return float(np.real(np.sum(np.abs(P) ** 2 * k ** 2 / (k ** 2 + dw ** 2))) / (2 * dI))
+    return H, PS, S1, 2 * dI
 
 
-def bg_table(a_bg=0.5, B=0.05):
-    rows = []
-    for k in (1e5, 1e6, 1e7):
-        for a in (0.01, 0.05, 0.2, 0.5, 1.0, 2.0):
-            y0 = singlet_yield(0, 0, B, k, a_bg); y129 = singlet_yield(0.5, a, B, k, a_bg); y131 = singlet_yield(1.5, -0.297 * a, B, k, a_bg)
-            rows.append(dict(k=k, a_mT=a, a_bg_mT=a_bg, B_mT=B, phi0=y0, d129=y129 - y0, d131=y131 - y0,
-                             rel129=(y129 - y0) / y0, rel131=(y131 - y0) / y0))
-    return rows
+def singlet_yield(I, a_mT, B_mT, k, a_bg_mT=0.5, r=0.0):
+    H, PS, S1, Z = system(I, a_mT, B_mT, a_bg_mT)
+    n = H.shape[0]
+    if r == 0:                                                # coherent: closed form in the eigenbasis
+        E, V = np.linalg.eigh(H); P = V.conj().T @ PS @ V; dw = E[:, None] - E[None, :]
+        return float(np.real(np.sum(np.abs(P) ** 2 * k ** 2 / (k ** 2 + dw ** 2))) / Z)
+    Id = np.eye(n)
+    # Liouvillian on vec(rho) (column stacking): vec(A rho B) = (B^T kron A) vec(rho)
+    Lv = -1j * (np.kron(Id, H) - np.kron(H.T, Id)) - k * np.eye(n * n)
+    for Sop in S1:                                            # Lindblad: r (S rho S - 1/2 {S S, rho}), S Hermitian
+        SS = Sop @ Sop
+        Lv += r * (np.kron(Sop.T, Sop) - 0.5 * np.kron(Id, SS) - 0.5 * np.kron(SS.T, Id))
+    rho0 = (PS / Z).reshape(-1, order='F')
+    x = np.linalg.solve(-Lv, rho0)                            # integral of rho(t) dt
+    return float(np.real(k * np.trace(PS @ x.reshape(n, n, order='F'))))
+
+
+def effects(a, k, r, B=0.05, a_bg=0.5):
+    y0 = singlet_yield(0, 0, B, k, a_bg, r); y9 = singlet_yield(0.5, a, B, k, a_bg, r); y1 = singlet_yield(1.5, R131 * a, B, k, a_bg, r)
+    return dict(phi0=y0, rel129=(y9 - y0) / y0, rel131=(y1 - y0) / y0)
 
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
-    res = []
-    for k in (1e5, 1e6, 1e7):
-        for a in (0.05, 0.2, 0.5, 1.0, 2.0, 5.0):
-            for B in (0.0, 0.05, 0.5, 1.0):
-                y0 = singlet_yield(0, 0, B, k); y129 = singlet_yield(0.5, a, B, k); y131 = singlet_yield(1.5, -0.297 * a, B, k)
-                res.append(dict(k=k, a_mT=a, B_mT=B, phi0=y0, phi129=y129, phi131=y131, d129=y129 - y0, d131=y131 - y0))
-    bg = bg_table()
-    json.dump(dict(no_background=res, background_proton_0p5mT=bg), open(os.path.join(OUT, 'radical_pair.json'), 'w'), indent=1)
-    print('--- with a partner-radical proton (0.5 mT), geomagnetic field')
-    for r in bg:
-        print(f"k={r['k']:.0e} a={r['a_mT']:>4} mT  phi0={r['phi0']:.3f}  rel129={100 * r['rel129']:+.1f}%  rel131={100 * r['rel131']:+.1f}%")
-    # summary at the geomagnetic field
-    for r in res:
-        if r['B_mT'] == 0.05:
-            print(f"k={r['k']:.0e} a={r['a_mT']:>4} mT  dPhi129={r['d129']:+.3f}  dPhi131={r['d131']:+.3f}  ratio={r['d129'] / r['d131'] if abs(r['d131']) > 1e-6 else np.nan:+.2f}")
-    # figure: isotope effect vs hyperfine (geomagnetic field), and field dependence for a = 1 mT
+    # check: the coherent closed form and the Liouville solver agree at tiny r
+    c1 = singlet_yield(0.5, 1.0, 0.05, 5e7, 0.5, 0.0); c2 = singlet_yield(0.5, 1.0, 0.05, 5e7, 0.5, 1.0)
+    print('closed form vs Liouville (r ~ 0):', round(c1, 6), round(c2, 6))
+    rows = []
+    for k in (1e6, 1e7, 5.5e7, 1e8, 1e9):
+        for a in (0.05, 0.1, 0.2, 0.5, 1.0, 2.0):
+            for r in (0.0, 1e7, 1e8, 1e9):
+                e = effects(a, k, r); rows.append(dict(k=k, a_mT=a, r=r, **e))
+    json.dump(dict(gamma_e=GAMMA_E, a_bg_mT=0.5, B_mT=0.05, rows=rows), open(os.path.join(OUT, 'radical_pair.json'), 'w'), indent=1)
+    print('k (1/s)   a(mT)  r=0: 129 / 131      r=1e8: 129 / 131    r=1e9: 129 / 131')
+    for k in (1e6, 1e7, 5.5e7, 1e8, 1e9):
+        for a in (0.1, 0.2, 0.5, 1.0, 2.0):
+            g = {x['r']: x for x in rows if x['k'] == k and x['a_mT'] == a}
+            print(f'{k:8.1e} {a:5.2f}  {100*g[0.0]["rel129"]:+6.1f}% {100*g[0.0]["rel131"]:+6.1f}%   '
+                  f'{100*g[1e8]["rel129"]:+6.1f}% {100*g[1e8]["rel131"]:+6.1f}%   {100*g[1e9]["rel129"]:+6.1f}% {100*g[1e9]["rel131"]:+6.1f}%')
+    # Smith et al. 2021 parameters (O2*- / TrpH*+ pair): a' = 1.896 mT, k = 5.5e7, r = 5e6, partner 14N-like 0.347 mT
+    sm = effects(1.896, 5.5e7, 5e6, a_bg=0.347)
+    print('Smith 2021 parameter set:', {k_: round(v, 4) for k_, v in sm.items()})
     fig, ax = plt.subplots(1, 2, figsize=(11, 3.8))
-    for k, ls in ((1e5, ':'), (1e6, '-'), (1e7, '--')):
-        sub = [r for r in res if r['k'] == k and r['B_mT'] == 0.05]
-        ax[0].plot([r['a_mT'] for r in sub], [r['d129'] for r in sub], color='#2a78d6', ls=ls, label=f'129Xe, k={k:.0e}/s')
-        ax[0].plot([r['a_mT'] for r in sub], [r['d131'] for r in sub], color='#eb6834', ls=ls, label=f'131Xe, k={k:.0e}/s')
+    for r, ls in ((0.0, '-'), (1e8, '--'), (1e9, ':')):
+        for col, key in (('#2a78d6', 'rel129'), ('#eb6834', 'rel131')):
+            sub = [x for x in rows if x['k'] == 5.5e7 and x['r'] == r]
+            ax[0].plot([x['a_mT'] for x in sub], [100 * x[key] for x in sub], color=col, ls=ls,
+                       label=f"{key[3:]}Xe, r={r:.0e}/s")
     ax[0].set_xscale('log'); ax[0].axhline(0, color='#e4e3df'); ax[0].set_xlabel('hyperfine coupling of 129Xe (mT)')
-    ax[0].set_ylabel('change in singlet yield vs spin-0 Xe'); ax[0].legend(frameon=False, fontsize=6.5)
-    ax[0].set_title('Isotope effect at the geomagnetic field (50 µT)', loc='left', fontsize=10, fontweight='bold')
-    Bs = np.linspace(0, 2, 41)
-    for I, a, col, nm in ((0, 0, '#8a8984', 'spin 0'), (0.5, 1.0, '#2a78d6', '129Xe (a = 1 mT)'), (1.5, -0.297, '#eb6834', '131Xe')):
-        ax[1].plot(Bs, [singlet_yield(I, a, B, 1e6) for B in Bs], color=col, label=nm)
-    ax[1].set_xlabel('static field (mT)'); ax[1].set_ylabel('singlet yield'); ax[1].legend(frameon=False, fontsize=7)
-    ax[1].set_title('Field dependence (k = 1e6 /s)', loc='left', fontsize=10, fontweight='bold')
+    ax[0].set_ylabel('change in singlet yield vs spin-0 Xe (%)'); ax[0].legend(frameon=False, fontsize=6.5)
+    ax[0].set_title('Lifetime 18 ns (k = 5.5e7 /s), 50 uT', loc='left', fontsize=10, fontweight='bold')
+    for a, col in ((0.1, '#8a8984'), (0.2, '#2a78d6'), (1.0, '#eb6834')):
+        sub = [x for x in rows if x['a_mT'] == a and x['r'] == 0.0]
+        ax[1].plot([x['k'] for x in sub], [100 * x['rel129'] for x in sub], color=col, marker='o', label=f'a = {a} mT')
+    ax[1].set_xscale('log'); ax[1].axhline(0, color='#e4e3df'); ax[1].set_xlabel('recombination rate k (1/s)')
+    ax[1].set_ylabel('129Xe effect (%)'); ax[1].legend(frameon=False, fontsize=7)
+    ax[1].set_title('129Xe effect vs lifetime (no relaxation)', loc='left', fontsize=10, fontweight='bold')
     for a_ in ax: a_.spines['top'].set_visible(False); a_.spines['right'].set_visible(False)
     fig.tight_layout(); fig.savefig(os.path.join(OUT, 'fig_radical_pair.png'), dpi=150)
