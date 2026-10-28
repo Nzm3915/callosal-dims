@@ -276,6 +276,7 @@ python phase7/phase7_gain_pooled.py results                                     
 python phase7/phase7_audit.py CACHE_DIR results                                        # mouse-level statistics, rewrite test, unit selection
 python phase7/phase7_committee_test.py CACHE_DIR results/units_labeled.csv results/phase7  # committee vs single-driver null
 python phase7/phase7_circuit_seeds.py results; python phase7/phase7_circuit_robust.py     # circuit robustness to network seeds
+python phase7/phase7_rampdown.py CACHE_DIR results/units_labeled.csv results/phase7  # gain account within the same neurons (end of the laser)
 python phase7/phase7_plot.py results
 ```
 
@@ -288,6 +289,7 @@ python phase7/phase7_plot.py results
 | Biased ceilings | The top receiving direction and the DLAG ceiling were estimated with the same trials used to score them. Unbiased three-way estimates: 0.51 (1 dim), 0.64 (DLAG's k); conclusions unchanged |
 | Committee readout (B1) | Disattenuated inter-hemispheric correlation of the choice state is ≥ 0.9; a single-driver null with the measured reliabilities reproduces the 'more confident side wins' excess (+0.039 vs observed +0.025). B1 downgraded to unresolved |
 | Circuit model (B5') | Not robust to network seeds; see Phase 6 table |
+| Gain account within the same neurons (B8) | Moving the response window through the end of the laser: rates recover within 0.1 s, the state dependence ~0.1 s later (−0.21 of b1 remains when rates are back). Gain explains ~40% at the end of the laser (as pooled); the rest is a slower mechanism. B8 kept as partial |
 
 ## Conclusion
 
