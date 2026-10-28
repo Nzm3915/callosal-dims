@@ -88,11 +88,14 @@ def analyse_pair(d, sil, rec):
 
     for _ in range(NSPLIT):
         est, c1, c2, s1, s2 = {}, {}, {}, {}, {}
+        u1, u2, u3 = {}, {}, {}
         for s in (True, False):
             p = rng.permutation(ctrl[s]); n3 = len(p) // 3
             est[s], c1[s], c2[s] = p[:n3], p[n3:2 * n3], p[2 * n3:3 * n3]
             q = rng.permutation(stim[s]); h = len(q) // 2
             s1[s], s2[s] = q[:h], q[h:2 * h]
+            g3 = len(q) // 3
+            u1[s], u2[s], u3[s] = q[:g3], q[g3:2 * g3], q[2 * g3:3 * g3]
         E = np.r_[est[True], est[False]]
         mu = rB[E][:, :, wdel].mean((0, 2)); sd = rB[E][:, :, wdel].std((0, 2)) + 1.0
         z = (rB - mu[None, :, None]) / sd[None, :, None]
@@ -120,6 +123,18 @@ def analyse_pair(d, sil, rec):
             U1 = np.linalg.svd(D1, full_matrices=False)[0][:, 0]
             add(f'{e}_f_rec1', 0.5 * (np.sum((U1 @ D1) * (U1 @ D2)) + np.sum((np.linalg.svd(D2, full_matrices=False)[0][:, 0] @ D2) *
                                                                          (np.linalg.svd(D2, full_matrices=False)[0][:, 0] @ D1))))
+            # conservative (three-way) estimate: direction from a third of the stim trials (u3 vs est controls),
+            # evaluated on two further independent thirds (u1 vs c1, u2 vs c2): no shared noise with the direction
+            D3 = np.concatenate([z[u3[s]][:, :, w].mean(0) - z[est[s]][:, :, w].mean(0) for s in (True, False)], 1)
+            E1 = np.concatenate([z[u1[s]][:, :, w].mean(0) - z[c1[s]][:, :, w].mean(0) for s in (True, False)], 1)
+            E2 = np.concatenate([z[u2[s]][:, :, w].mean(0) - z[c2[s]][:, :, w].mean(0) for s in (True, False)], 1)
+            U3 = np.linalg.svd(D3, full_matrices=False)[0]
+            add(f'{e}_den3', np.sum(E1 * E2))
+            for kk in (1, 3):
+                P3 = U3[:, :kk]
+                add(f'{e}_g3_rec{kk}', np.sum((P3.T @ E1) * (P3.T @ E2)))
+            for k, v in modes.items():
+                add(f'{e}_g3_{k}', np.sum((v @ E1) * (v @ E2)))
             add(f'{e}_cos_rec1_RMe', abs(U1 @ rm_e))
             add(f'{e}_cos_rec1_CD', abs(U1 @ cd))
             # does the input land in a direction B itself uses? variance of B's own activity along U1
@@ -156,6 +171,8 @@ def analyse_pair(d, sil, rec):
         for k in list(acc):
             if k.startswith(f'{e}_f_'):
                 row[k] = acc[k] / den
+            if k.startswith(f'{e}_g3_'):
+                row[k] = acc[k] / acc[f'{e}_den3']
         for k in ('cos_rec1_RMe', 'cos_rec1_CD', 'loss_RMe', 'own_RMe', 'proj_RMe', 'align_tot', 'align_noise',
                   'align_sig', 'alignCD_tot', 'alignCD_noise', 'alignCD_sig'):
             row[f'{e}_{k}'] = acc[f'{e}_{k}'] / n
@@ -177,7 +194,7 @@ if __name__ == '__main__':
             if r: rows.append(r)
     df = pd.DataFrame(rows)
     df.to_csv(os.path.join(OUT, 'phase6_modes.csv'), index=False)
-    cols = [c for c in df.columns if c.startswith('during_f_')] + ['f_rand1']
+    cols = [c for c in df.columns if c.startswith('during_f_') or c.startswith('during_g3_')] + ['f_rand1']
     print(len(df), 'pairs')
     print(df[cols].median().round(3).to_string())
     print(df[[c for c in df.columns if c.startswith('after_f_')]].median().round(3).to_string())

@@ -4,7 +4,7 @@ import csv, glob, os, numpy as np, pandas as pd
 
 def read_summary(R):
     rows = []
-    for f in sorted(glob.glob(os.path.join(R, 'phase6', 'phase6_dlag_*_*.csv'))):
+    for f in sorted(glob.glob(os.path.join(R, 'phase6', 'phase6_dlag_*_*.csv')) + glob.glob(os.path.join(R, 'phase6_dlag_*_*.csv'))):
         with open(f) as fh:
             rd = csv.reader(fh); next(rd)
             for r in rd:

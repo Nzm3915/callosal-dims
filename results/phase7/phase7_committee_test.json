@@ -1,0 +1,40 @@
+{
+ "ex_obs": {
+  "median_sessions": 0.025000000000000022,
+  "median_mice": 0.028089887640449396,
+  "p_mice": 0.07099126607729349
+ },
+ "ex_null": {
+  "median_sessions": 0.03854522847373332,
+  "median_mice": 0.023309758415427817,
+  "p_mice": 0.8957254780943913
+ },
+ "gap": {
+  "median_sessions": 0.07415916006690448,
+  "median_mice": 0.07885431601930049,
+  "p_mice": 1.562486431794241e-06
+ },
+ "w_other_fit": {
+  "median_sessions": 0.75,
+  "median_mice": 0.75,
+  "p_mice": null
+ },
+ "rel_A": {
+  "median_sessions": 0.48644411785352654,
+  "median_mice": 0.4647020371812255,
+  "p_mice": null
+ },
+ "rel_B": {
+  "median_sessions": 0.4569596950685637,
+  "median_mice": 0.44523697359835923,
+  "p_mice": null
+ },
+ "r_true": {
+  "median_sessions": 0.95,
+  "median_mice": 0.9319265348149767,
+  "p_mice": null
+ },
+ "p_mice_obs_vs_null": 0.3430258697408135,
+ "n_sessions": 127,
+ "n_mice": 39
+}

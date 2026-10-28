@@ -70,6 +70,19 @@ for f in sorted(glob.glob(os.path.join(R, 'phase6', 'dlag', '*.npz'))):
             for k, V in subs.items():
                 if V.shape[1]:
                     acc[k] += np.sum((V.T @ D1) * (V.T @ D2))
+            # conservative ceiling: direction from one third of stim (vs one third of controls), scored on the other thirds
+            th = {s_: (rng.permutation(stim[s_]), rng.permutation(ctrl[s_])) for s_ in (True, False)}
+            def part(i, s_):
+                st_, ct_ = th[s_]; a, b = len(st_) // 3, len(ct_) // 3
+                return Y[st_[i * a:(i + 1) * a]].mean(0) - Y[ct_[i * b:(i + 1) * b]].mean(0)
+            G3 = np.concatenate([part(2, s_) for s_ in (True, False)], 1)
+            G1 = np.concatenate([part(0, s_) for s_ in (True, False)], 1)
+            G2 = np.concatenate([part(1, s_) for s_ in (True, False)], 1)
+            acc['den3'] = acc.get('den3', 0.0) + np.sum(G1 * G2)
+            if k_pa:
+                U3 = orth(G3, k_pa)
+                acc['g3_rec_pa'] = acc.get('g3_rec_pa', 0.0) + np.sum((U3.T @ G1) * (U3.T @ G2))
+                acc['g3_dlag_across'] = acc.get('g3_dlag_across', 0.0) + np.sum((subs['dlag_across'].T @ G1) * (subs['dlag_across'].T @ G2))
             for nm, kk in (('rec_pa', k_pa), ('rec_shared', k_sh)):
                 if kk:
                     U1, U2 = orth(D1, kk), orth(D2, kk)
@@ -79,6 +92,8 @@ for f in sorted(glob.glob(os.path.join(R, 'phase6', 'dlag', '*.npz'))):
         for k in list(subs) + ['rec_pa', 'rec_shared']:
             row[f'f_{k}'] = acc[k] / acc['den'] if acc['den'] > 0 else np.nan
         row['f_rand_pa'] = pa / len(ub); row['f_rand_shared'] = k_sh / len(ub)
+        if pa and acc.get('den3', 0) > 0:
+            row['g3_rec_pa'] = acc['g3_rec_pa'] / acc['den3']; row['g3_dlag_across'] = acc['g3_dlag_across'] / acc['den3']
         rows.append(row)
 
 df = pd.DataFrame(rows); ss = pd.DataFrame(sess_rows)
@@ -110,10 +125,11 @@ summ = dict(n_sessions=len(d), n_mice=d.mouse.nunique(), frac_pa_pos=(d.pa > 0).
             n_latents=len(dl), frac_directional=dr.mean(), med_abs_delay_dir=np.median(np.abs(dl[dr])),
             frac_code1_leads=np.mean(dl[dr] > 0), across_strength=np.median(np.r_[d.across_strength1[d.pa > 0], d.across_strength2[d.pa > 0]]),
             tau_median_ms=np.median(taus), flow_rho=rho, flow_p=p, flow_n=len(mm), n_pairs=len(g))
-for k in ('f_dlag_across', 'f_dlag_AtoB', 'f_dlag_BtoA', 'f_dlag_within', 'f_dlag_shared', 'f_rec_pa', 'f_rec_shared', 'f_rand_pa', 'f_rand_shared'):
+for k in ('g3_rec_pa', 'g3_dlag_across', 'f_dlag_across', 'f_dlag_AtoB', 'f_dlag_BtoA', 'f_dlag_within', 'f_dlag_shared', 'f_rec_pa', 'f_rec_shared', 'f_rand_pa', 'f_rand_shared'):
     summ[k] = g[k].median()
 summ['p_across_vs_rand'] = wilcoxon(g.f_dlag_across - g.f_rand_pa).pvalue
 summ['p_across_vs_rec'] = wilcoxon(g.f_dlag_across - g.f_rec_pa).pvalue
+summ['p_across_vs_rec3'] = wilcoxon((g.g3_dlag_across - g.g3_rec_pa).dropna()).pvalue
 summ['p_AtoB_vs_BtoA'] = wilcoxon((g.f_dlag_AtoB - g.f_dlag_BtoA).dropna()).pvalue
 import json
 json.dump(summ, open(os.path.join(R, 'phase6', 'phase6_dlag_summary.json'), 'w'), indent=1, default=float)
