@@ -6,7 +6,7 @@ with unilateral silencing in mouse ALM, toward the minimal specification of a ca
 ## Documents (Japanese)
 
 - [docs/01_mouse_callosal_dims.md](docs/01_mouse_callosal_dims.md) — background, questions, phases and results of this project
-- [docs/02_split_brain_world_models.md](docs/02_split_brain_world_models.md) — the follow-up master's research plan (split-brain world models)
+- Follow-up master's research plan (split-brain world models): [Nzm3915/split-brain-world-models](https://github.com/Nzm3915/split-brain-world-models)
 
 Data: [DANDI 000894](https://dandiarchive.org/dandiset/000894) — simultaneous bilateral ALM recordings
 with unilateral / bilateral photoinhibition (Chen, Kang, Lindsey, Druckmann & Li, *Cell* 2021).
