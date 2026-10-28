@@ -24,6 +24,9 @@ check('phase2 correlated 3-dim', '3方向で 0.14', round(d.f_corr3.median(), 3)
 check('phase2 own PCs 3-dim', 'B自身の上位3主成分 0.15', round(d.f_pc3.median(), 3))
 check('phase2 signal 3-dim', 'Bの試行平均の信号の方向 0.17', round(d.f_sig3.median(), 3))
 check('phase2 random 3-dim', 'でたらめ 0.07', round(d.f_rand3.median(), 3))
+marg = [round((d[f'g_rec{k}'] - d[f'g_rec{k-1}']).median(), 3) for k in range(2, 6)]   # median of per-pair gains
+check('dimension ladder', '0.49 → +0.063 → +0.043 → **+0.024** → +0.018',
+      (round(d.g_rec1.median(), 3), marg))
 
 mo = pd.read_csv(os.path.join(R, 'phase6', 'phase6_modes.csv')) if os.path.exists(os.path.join(R, 'phase6', 'phase6_modes.csv')) else None
 if mo is not None and 'during_g3_cd' in mo:
