@@ -182,6 +182,31 @@ that none of the models capture — plausibly what Chen et al. described as stat
 cannot tell gating apart from the receiving hemisphere's own choice attractor. Which side leads is an individual
 trait, so a callosal link would need per-animal calibration.
 
+## Phase 5 — mechanisms, with approaches from the literature
+
+```
+python phase5/phase5_mechanisms.py CACHE_DIR results/units_labeled.csv results/phase5   # rotation, behaviour, 1-D drift
+python phase5/phase5_choice_axis.py CACHE_DIR results/units_labeled.csv results/phase5  # choice-axis models
+python phase5/phase5_latency.py CACHE_DIR results                                        # FS vs pyramidal time course
+python phase5/phase5_plot.py results
+```
+
+![phase5](results/phase5/fig_phase5.png)
+![latency](results/phase5/fig_phase5_latency.png)
+
+| Question (approach) | Finding |
+| --- | --- |
+| Which cells receive the callosal input? (cf. Wang et al. 2023, ACA callosal → PV loop) | Fast-spiking units (assigned to a hemisphere by their activation under that hemisphere's light) drop to 0.55 of control when the *other* hemisphere is silenced, pyramidal units to 0.87 (414 vs 9,785 units, p = 2e-41); 70% vs 42% drop by > 20% |
+| In what order? | FS and decreasing pyramidal units drop within the first 50 ms, together with the silenced side; increasing pyramidal units rise 50–150 ms later (disinhibition). After the laser, FS on the other side overshoot by ~40% (rebound from the silenced side) |
+| Does the channel rotate? (Javadzadeh & Hofer 2022) | Within the laser epoch the receiving direction changes with τ ≈ 0.8 s, like B's own activity (0.9 s); after the laser τ ≈ 1.2 s. Laser-epoch and post-laser directions are orthogonal (cosine −0.01): the channel switches with the kind of input (loss vs rebound), it does not rotate on a 100-ms scale |
+| Does the receiving response matter for behaviour? | Performance drops 81.5% → 75.6%; the drop follows the modularity of the remaining hemisphere (ρ = −0.30, p = 3e-6) but not the size of the receiving response (ρ = 0.06, p = 0.33). B's laser-epoch choice confidence predicts correct licks (AUC 0.61; silenced A 0.53) |
+| Is the choice-axis state dependence an attractor or a gate? (Inagaki et al. 2019 drift analysis; Finkelstein et al. 2021) | No: 1-D choice-axis models with B alone (linear or cubic/attractor), a fixed link, a precision gate or gate + attractor all give c1 ≈ 0 (data −0.10). Links fitted on these data are ~0 (median w = 0.01): on the choice axis too, the link is invisible in normal trials |
+
+Reading: the callosal input lands heavily on inhibitory cells; most of what it does to the other hemisphere is
+not what matters for behaviour; and the choice-axis state dependence is neither a precision gate nor a simple
+attractor — a change of gain (via inhibition) is the remaining candidate. Next steps and the reading list are in
+docs/01 sections 6–7.
+
 ## Conclusion
 
 | Specification of a callosal link (ALM, delay epoch) | Result |
@@ -190,5 +215,7 @@ trait, so a callosal link would need per-animal calibration.
 | How to learn it | from perturbation data; links fitted to normal activity alone predict nothing |
 | Delay | ≤ 100 ms |
 | Bit rate | ~90 bit/s (3 dims × 3 bits × 10 Hz), for ~40 neurons per side |
-| Gating | not needed for the bulk of the response; the choice-axis state dependence remains unexplained |
+| Gating | not needed for the bulk of the response; the choice-axis state dependence remains unexplained (not an attractor or a precision gate) |
+| Where it acts | heavily on inhibitory (fast-spiking) cells, within 50 ms |
+| What to evaluate it by | preserving the choice axis, not reproducing the whole response (which does not predict behaviour) |
 | Individual calibration | needed: the leading hemisphere is a trait of the animal |
