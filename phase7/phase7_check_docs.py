@@ -59,10 +59,18 @@ check('label validation: mice', '39匹中36匹で同じ向きだった（p = 1.5
 au = json.load(open(os.path.join(R, 'phase7', 'phase7_audit.json')))['A1']
 own = au['phase7-2: fraction of c1 by own (bootstrap over mice)']
 loop = au['phase7-2: fraction of c1 by loop1 (bootstrap over mice)']
-check('gain pooled own (mouse bootstrap)', '状態依存性の 42%（95%区間 19〜139%）',
+check('gain pooled own (mouse bootstrap)', '42%（95%区間 19〜139%）',
       (round(100 * own['fraction']), [round(100 * x) for x in own['ci']]))
 check('gain pooled loop1 (mouse bootstrap)', '0.77（0.38〜2.54）',
       (round(loop['fraction'], 2), [round(x, 2) for x in loop['ci']]))
+gp = json.load(open(os.path.join(R, 'phase7', 'phase7_gain_pooled.json')))
+check('two recurrent passes', '2周で 0.99', round(gp['a1.0_k2']['fraction'], 2))
+check('unchanged-rate neurons', '0.9 < $g$ < 1.1 の 2,597 個で傾きの比 0.83（0.51〜1.17）',
+      (gp['unchanged_rate']['n'], round(gp['unchanged_rate']['slope_ratio'], 2),
+       [round(x, 2) for x in gp['unchanged_rate']['ci']]))
+ng = pd.read_csv(os.path.join(R, 'phase6', 'phase6_neurongain_pairs.csv'))
+alphas = {a: round(ng[f'c1_pred_{a}'].sum() / ng.c1_obs.sum(), 2) for a in (0.5, 1.0, 1.3, 1.5, 2.0)}
+check('alpha ladder', '0.28／0.42／0.44／0.43／0.24', alphas)
 
 rd = json.load(open(os.path.join(R, 'phase7', 'phase7_rampdown.json')))
 w0 = rd['-1.3..-0.9']
