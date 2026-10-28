@@ -109,6 +109,7 @@ $d$ を増やしても予測が良くならなくなる点が「実際に使わ�
 | Semedo ら 2019 *Neuron* | 領域間の通信は少数次元を通る | 相関にもとづき、因果は問えない |
 | McDonnell ら 2026 *Nat Commun* | サル前頭前野の左右の共有成分は多次元で、覚醒と連動する | 抑制実験がない |
 | Gokcen ら 2022 *Nat Comput Sci* | DLAG：共有成分を、遅れと向きつきで分ける | 遅れの向きが因果の向きかは確かめられない |
+| Gonzalez ら 2026 *Nature*（見直しで追加） | 海馬と脳梁膨大後部の通信部分空間を、第三の領域を統制した正準相関で同定。睡眠中のリプレイと対応する | 介入がなく、相関にもとづく。本研究の指摘がそのまま当てはまる |
 | Finkelstein ら 2021 *Nat Neurosci*、Inagaki ら 2019 *Nature* | ランプの入力が選択のアトラクターを引き離し、計画を守る | 脳梁の入力が失われたときにも働くかは不明 |
 
 **空白**：「左右で相関する方向」と「片側が壊れたときに反対側で変わる方向」を、同じデータで比べた研究はなかった。Chen の公開データ（DANDI 000894）で、この空白を埋めた。
@@ -450,7 +451,7 @@ $$
 
 ### 6.1 神経科学として
 
-1. **相関は通信ではない。** 左右が一緒に揺れる方向も、最良の相関の方法（DLAG）が推定した「信号の流れ」も、介入で測った通信をほとんど含まない。相関から多領域の相互作用を語るときは、介入で確かめる必要がある（Javadzadeh & Hofer 2022、Lepperød ら 2023 の一般論を、半球間で量として示した）。
+1. **相関は通信ではない。** 左右が一緒に揺れる方向も、最良の相関の方法（DLAG）が推定した「信号の流れ」も、介入で測った通信をほとんど含まない。相関から多領域の相互作用を語るときは、介入で確かめる必要がある（Javadzadeh & Hofer 2022、Lepperød ら 2023 の一般論を、半球間で量として示した）。通信部分空間を相関だけから同定する研究は今も続いており（Gonzalez ら 2026）、この指摘は現在進行形で当てはまる。
 2. **左右はほぼ同じ状態を、別々に保てる。** 普通の試行では左右の選択の状態の相関は0.9以上なのに、片側を失っても成績は6ポイントしか落ちず、止められた側は自分の元の配分に戻る。強い共有と、壊れにくい独立が両立している。
 3. **脳梁の入力の大部分は、課題のモードの外に入り、抑制性細胞を通る。** 行動に効くのは、そのうちの選択軸の小さな成分だ。
 4. **状態依存性は「判断」ではなく「素子の性質」かもしれない。** ゲートやアトラクターを持ち出さなくても、ニューロンの入出力曲線の曲がりで少なくとも4割は説明できた。
@@ -531,6 +532,7 @@ $$
 - McDonnell ME, Umakantha A, Williamson RC, Smith MA, Yu BM. Interactions across hemispheres in prefrontal cortex reflect global cognitive processing. *Nat Commun* **17**, 5088 (2026). https://doi.org/10.1038/s41467-026-71725-0
 - Javadzadeh M, Hofer SB. Dynamic causal communication channels between neocortical areas. *Neuron* **110**(15), 2470–2483.e7 (2022). https://doi.org/10.1016/j.neuron.2022.05.011
 - Lepperød ME ほか. Inferring causal connectivity from pairwise recordings and optogenetics. *PLoS Comput Biol* **19**, e1011574 (2023). https://doi.org/10.1371/journal.pcbi.1011574
+- Gonzalez J, Vöröslakos M, Aykan D, Soto N, Nitzan N, Swanson R, Karadas M, Chen ZS, Buzsáki G ほか. Subspace communication in the hippocampal–retrosplenial axis. *Nature* **655**, 192–201 (2026). https://doi.org/10.1038/s41586-026-10481-z
 - Perich MG ほか. Inferring brain-wide interactions using data-constrained recurrent neural network models. *Neuron* (2026). https://doi.org/10.1016/j.neuron.2026.07.016
 - Wang Y ほか. A frontal transcallosal inhibition loop mediates interhemispheric balance in visuospatial processing. *Nat Commun* **14**, 5213 (2023). https://doi.org/10.1038/s41467-023-40985-5
 - Guo ZV ほか. Maintenance of persistent activity in a frontal thalamocortical loop. *Nature* **545**, 181–186 (2017). https://doi.org/10.1038/nature22324
