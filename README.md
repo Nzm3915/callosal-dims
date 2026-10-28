@@ -75,5 +75,40 @@ Reading: about half of the late-delay correlation (ρ ≈ 0.14 of 0.28) is alrea
 i.e. it is shared fluctuation that is not about the choice — a candidate for common input such as arousal
 (McDonnell et al. 2026). Separating that part from what one hemisphere actually sends the other is Phase 2.
 
-Next (Phase 2): correlated subspace (reduced-rank regression, pCCA-FA) versus receiving subspace (effect of
-unilateral photoinhibition on the other hemisphere), and the angles between them.
+## Phase 2 — receiving subspace versus correlated subspace
+
+```
+python phase2/phase2_subspaces.py CACHE_DIR results/units_labeled.csv results/phase2
+python phase2/phase2_plot.py results/phase2
+```
+
+Receiving response of hemisphere B to silencing A: Δ_B(t, c) = mean(B | silence A, c) − mean(B | control, c),
+100-ms bins, z-scored per unit, separately for the laser epoch (first 0.8 s of the delay) and the rest of the
+delay; the sample epoch (laser off) is a negative control. Candidate subspaces of B are estimated on a separate
+third of the control trials. Overlap is measured without noise bias as
+f(S) = ⟨PΔ₁, PΔ₂⟩ / ⟨Δ₁, Δ₂⟩ with Δ₁, Δ₂ from disjoint trial halves (1 = all of the reproducible response lies in S,
+k/n = chance). The receiving subspace's own ceiling uses directions from yet another third of the trials.
+
+![phase2](results/phase2/fig_phase2_subspaces.png)
+
+| Finding | Median of 266 hemisphere pairs |
+| --- | --- |
+| Silencing one side evokes a reproducible response in the other; none when the laser is off | split-half reliability 0.40 (laser on), 0.27 (after), 0.00 (sample epoch) |
+| The response is low-dimensional | own top 1 / 3 / 5 directions capture 49% / 61% / 66% (conservative); random 3 dims: 7% |
+| **The correlated subspace holds little of it** | 3 dims: 14% (2× chance, < ¼ of the receiving subspace); receiving > correlated in nearly every pair, p = 4e-42 |
+| …no more than B's own largest fluctuations or its task trajectories | 15% and 17% (3 dims) |
+| The correlated subspace is real but small | held-out R² of B's fluctuations from A: 3.4% (rank 3), > 0 in 97% of pairs |
+| Most of the response is not about the choice | trial-type-dependent part: 4% (laser on) – 8% (after); CD holds 38% of that part, 5% of the whole |
+| It is not a uniform drop | uniform direction 5%; 62% of units go down, 38% go up |
+| The direction changes between the laser epoch and recovery | laser-on subspace (3 dims) holds 15% of the later response vs 52% for its own |
+
+Reading: what one hemisphere contributes to the other (its loss under silencing) mostly lies outside the
+directions in which the two hemispheres co-fluctuate. A link that copied the correlated subspace would reproduce
+about one seventh of it.
+
+Limitations: the receiving ceiling is underestimated (a third of the trials); the correlated subspace is defined
+from within-trial residuals in 100-ms bins (pCCA-FA, McDonnell et al. 2026, not yet run); a small direct effect
+of scattered light on the other hemisphere cannot be fully excluded.
+
+Next (Phase 3): a model of B driven by a low-rank, delayed, gated link from A — find the minimal link that
+reproduces both control-trial activity and the response/recovery after silencing.
