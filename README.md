@@ -26,13 +26,15 @@ and review.
   to test whether the best correlation-based method can recover the causal channel (Phase 6).
 - Tested a dozen mechanistic hypotheses with pre-stated failure criteria (gates, attractors, ramping input, partner
   loss, inhibitory gain, circuit models); found that the state dependence of the callosal effect is partly explained
-  by single-neuron gain loss (Phase 6).
+  by single-neuron gain loss (Phase 6–7).
+- Ran a self-auditing loop over all results (mouse-level statistics, unbiased ceilings, null models for each claim)
+  and published the corrections it forced ([docs/00_review_log.md](docs/00_review_log.md)).
 
 ## Documents (Japanese)
 
 - [docs/01_mouse_callosal_dims.md](docs/01_mouse_callosal_dims.md) — background, questions, phases and results of this project
-- [docs/03_bold_hypotheses.md](docs/03_bold_hypotheses.md) — bold hypotheses (incl. quantum-brain and shared-consciousness claims) turned into algorithms and tested on this data
-- [docs/04_quantum_cellular_project.md](docs/04_quantum_cellular_project.md) — design of a cell-level test of quantum effects in neural function (nuclear-spin isotope ladder)
+- [docs/03_quantum_brain.md](docs/03_quantum_brain.md) — the quantum-brain hypothesis decomposed and tested, and a cell-level experiment (xenon / lithium isotopes) designed to settle the rest
+- [docs/00_review_log.md](docs/00_review_log.md) — self-improvement loop: what was doubted, how it was checked, and which conclusions were corrected
 - Follow-up master's research plan (split-brain world models): [Nzm3915/split-brain-world-models](https://github.com/Nzm3915/split-brain-world-models)
 
 Data: [DANDI 000894](https://dandiarchive.org/dandiset/000894) — simultaneous bilateral ALM recordings
@@ -253,14 +255,35 @@ python phase6/phase6_plot.py results
 
 | Question | Answer |
 | --- | --- |
-| Which of the receiver's modes carries the callosal response? (choice / ramping mode, Finkelstein 2021, Inagaki 2019; early / late / go CDs, Economo 2018) | None: the top receiving direction holds 74% of the reliable response; choice mode 4.9%, ramping mode 5.8–8.0%, all three non-selective modes 19%, Economo's CDs 2–4% (random 1-D: 2.4%). B's own variance along it is 1.26× a random direction |
+| Which of the receiver's modes carries the callosal response? (choice / ramping mode, Finkelstein 2021, Inagaki 2019; early / late / go CDs, Economo 2018) | None: the top receiving direction holds 51% of the reliable response (unbiased three-way estimate; 74% with the biased two-way estimate); choice mode 4.9%, ramping mode 5.8–8.0%, all three non-selective modes 19%, Economo's CDs 2–4% (random 1-D: 2.4%). B's own variance along it is 1.26× a random direction |
 | Does a stronger ramping mode protect the plan (Finkelstein Fig. 5f)? | No: stim × ramp = −0.006 (p = 0.88); behavioural error excess flat across ramp tertiles; c1 unchanged (−0.121 → −0.119) |
 | Is c1 an errors-in-variables artefact of losing a correlated partner? | No: measuring A better (0.4 → 1.2 s) leaves c1 at −0.12 to −0.13 |
 | Is B's fast-spiking rate the gain carrier (B2')? | No: FS drop to 0.62× but do not modulate persistence (f = −0.012, p = 0.68); predicted c1 = +0.006 vs −0.132 observed |
-| **New: single-neuron gain** — does each neuron lose the state it carries in proportion to its rate drop? | **Partly**: slope ratio ≈ g^1.3 for suppressed neurons (11,708 units, cross-validated); parameter-free prediction of c1 has the right sign (p = 4e-8) and ~30% of the observed size |
-| Is the silenced hemisphere rewritten from the other one? | No: after silencing, A depends *more* on its own pre-laser state (+0.058, p = 3e-5), less on B (−0.057); endpoint agreement drops 67.5% → 60.0% |
-| Circuit model with heterogeneous callosal input and adaptation (B5') | Heterogeneity predicts the held-out fractions of units going down/up (52%/28% vs data 42%/20%; 89%/1% without it). Adaptation gives a post-laser FS rebound of the right sign (+0.22) but not when the mean time courses are fitted jointly (data +0.40) |
+| **New: single-neuron gain** — does each neuron lose the state it carries in proportion to its rate drop? | **Partly**: suppressed neurons lose the state they carry roughly in proportion to their rate (11,708 units, cross-validated); the parameter-free prediction explains 42% of c1 pooled over pairs (95% CI 19–139%, bootstrap over mice; 77% with one recurrent pass) |
+| Is the silenced hemisphere rewritten from the other one? | No: with both predictors taken before the laser, A's end state depends on its own and on B's earlier state with unchanged weights (Δ +0.007, p = 0.88; Δ +0.024, p = 0.13). (An earlier version used B's laser-window state, which the laser degrades; corrected in Phase 7.) |
+| Circuit model with heterogeneous callosal input and adaptation (B5') | Heterogeneity is needed to get both up and down units (89%/1% without it), but over 5 network seeds it gives 31%/49% vs data 42%/20% (the first seed's 52%/28% was luck). Adaptation gives a rebound of the right sign (+0.23) but not jointly with the mean time courses (data +0.40) |
 | Does DLAG (re-implemented in PyTorch; delays and dimensionality recovered on synthetic data) find the callosal channel in normal trials? (B4') | It finds across-hemisphere latents in 88% of 126 sessions, 56% with significant delays (median 30 ms). But they hold 0.20 of the silencing response (receiving subspace of the same size: 0.89; random 0.07), and the inferred direction of flow does not match the causal asymmetry measured by silencing (ρ = -0.03, p = 0.74) |
+
+## Phase 7 — self-improvement loop: audits and corrections
+
+```
+python phase7/phase7_loop.py CACHE_DIR results/units_labeled.csv results/phase7        # round-trip hypothesis (ratio estimator + coupled model)
+python phase7/phase7_gain_pooled.py results                                            # pooled single-neuron gain with bootstrap CIs
+python phase7/phase7_audit.py CACHE_DIR results                                        # mouse-level statistics, rewrite test, unit selection
+python phase7/phase7_committee_test.py CACHE_DIR results/units_labeled.csv results/phase7  # committee vs single-driver null
+python phase7/phase7_circuit_seeds.py results; python phase7/phase7_circuit_robust.py     # circuit robustness to network seeds
+python phase7/phase7_plot.py results
+```
+
+![phase7](results/phase7/fig_phase7.png)
+
+| Audit | Outcome |
+| --- | --- |
+| Is the rest of c1 the loss of an interhemispheric round trip (B→A→B)? | No. Calibrating the link from c2 predicts c1 = −0.001 (mouse-level p = 0.56); a coupled two-hemisphere model fitted with silencing trials finds couplings of ~0.02 and does not even reproduce c0. Calibrating from c0 instead is inconsistent with c2 (predicts −0.20 vs −0.05) |
+| Pseudo-replication (pairs from the same session/mouse) | Every headline effect survives one-value-per-mouse tests (39 mice; most with all 39 in the same direction) |
+| Biased ceilings | The top receiving direction and the DLAG ceiling were estimated with the same trials used to score them. Unbiased three-way estimates: 0.51 (1 dim), 0.64 (DLAG's k); conclusions unchanged |
+| Committee readout (B1) | Disattenuated inter-hemispheric correlation of the choice state is ≥ 0.9; a single-driver null with the measured reliabilities reproduces the 'more confident side wins' excess (+0.039 vs observed +0.025). B1 downgraded to unresolved |
+| Circuit model (B5') | Not robust to network seeds; see Phase 6 table |
 
 ## Conclusion
 
@@ -270,7 +293,7 @@ python phase6/phase6_plot.py results
 | How to learn it | from perturbation data; links fitted to normal activity alone predict nothing |
 | Delay | ≤ 100 ms |
 | Bit rate | ~90 bit/s (3 dims × 3 bits × 10 Hz), for ~40 neurons per side |
-| Gating | not needed for the bulk of the response; the choice-axis state dependence is not a gate, attractor, ramp or inhibitory-rate gain — about 30% of it is single-neuron gain loss, so a link must preserve each neuron's operating point, not just the mean rate |
+| Gating | not needed for the bulk of the response; the choice-axis state dependence is not a gate, attractor, ramp or inhibitory-rate gain — single-neuron gain loss explains ~40% (CI up to all of it), so a link must preserve each neuron's operating point, not just the mean rate |
 | Where it acts | heavily on inhibitory (fast-spiking) cells, within 50 ms |
 | What to evaluate it by | preserving the choice axis, not reproducing the whole response (which does not predict behaviour) |
 | Individual calibration | needed: the leading hemisphere is a trait of the animal |

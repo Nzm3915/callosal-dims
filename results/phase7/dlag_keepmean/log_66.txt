@@ -1,0 +1,3 @@
+sub-BAYLORGC80/sub-BAYLORGC80_ses-20190707_ecephys+ogen.nwb pa 0 delays  101s
+sub-BAYLORGC80/sub-BAYLORGC80_ses-20190712_ecephys+ogen.nwb pa 0 delays  71s
+sub-BAYLORGC81/sub-BAYLORGC81_ses-20190918_ecephys+ogen.nwb pa 2 delays 132.1;43.4 371s

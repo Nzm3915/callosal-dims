@@ -23,7 +23,7 @@ a = ax[0, 0]; m = pd.read_csv(os.path.join(R, 'phase6_modes.csv'))
 items = [('during_f_CD', 'choice\nmode', BLUE), ('during_f_RM_early', 'ramp\n(laser win.)', ORANGE),
          ('during_f_RM_late', 'ramp\n(late)', ORANGE), ('during_f_SM', 'sample\nonset', ORANGE),
          ('during_f_NS3', 'all 3\nnon-sel.', ORANGE), ('during_f_CDe', 'CD\nearly', BLUE), ('during_f_CDl', 'CD\nlate', BLUE),
-         ('during_f_CDgo', 'CD\ngo', BLUE), ('during_f_rec1', 'top recv.\ndirection', AQUA), ('f_rand1', 'random\n1-D', MUTED)]
+         ('during_f_CDgo', 'CD\ngo', BLUE), ('during_g3_rec1', 'top recv.\ndir. (unbiased)', AQUA), ('f_rand1', 'random\n1-D', MUTED)]
 for i, (k, lab, col) in enumerate(items):
     strip(a, i, m[k].clip(-0.2, 1.05), col, i)
 a.set_xticks(range(len(items))); a.set_xticklabels([l for _, l, _ in items], fontsize=6.5)
@@ -37,14 +37,13 @@ fg = pd.read_csv(os.path.join(R, 'phase6_fsgain.csv')); ng = pd.read_csv(os.path
 best_partner = pt[(pt.winB == 0.4) & (pt.winA == '1.2') & (pt.Aunits == 'all')]
 items = [(p4.p4_c1, 'observed c1\n(Phase 4 model)', INK), (p4.r_c1, '+ ramp\nterms', ORANGE),
          (best_partner.c1, 'A measured\nbetter (1.2 s)', BLUE), (fg.F_med_c1, '+ FS gain\nterms', AQUA),
-         (fg.F_c1pred, 'predicted from\nFS gain', AQUA), (ng.c1_obs, 'observed\n(neuron sum)', INK),
-         (ng['c1_pred_1.3'], 'predicted from\nneuron gain', YELLOW)]
+         (fg.F_c1pred, 'predicted from\nFS gain', AQUA)]
 for i, (v, lab, col) in enumerate(items):
     strip(a, i, np.clip(v, -0.6, 0.4), col, i)
 a.axhline(0, color=GRID, lw=1, zorder=0)
 a.set_xticks(range(len(items))); a.set_xticklabels([l for _, l, _ in items], fontsize=6.5)
-a.set_ylabel('state dependence c1'); a.axvline(4.5, color=GRID, lw=1)
-a.set_title('B  Candidate carriers of the state dependence\n(left: regression units; right: neuron-sum units)')
+a.set_ylabel('state dependence c1')
+a.set_title('B  Population-level carriers do not\nexplain the state dependence')
 
 # C single-neuron gain
 a = ax[0, 2]; un = pd.read_csv(os.path.join(R, 'phase6_neurongain_units.csv'))
@@ -63,16 +62,17 @@ for al, ls in ((0, ':'), (1, '--'), (2, '-.')):
     a.plot(gg, gg ** al, color=MUTED, ls=ls, lw=1, label=f'g^{al}')
 a.set_xlabel('rate ratio g (silence A / control)'); a.set_ylabel("slope ratio (state carried, stim / control)")
 a.set_xlim(0.3, 2.0); a.set_ylim(0, 2.2); a.legend(frameon=False, fontsize=7)
-a.set_title('C  Neurons pushed down lose the\nstate they carry, faster than their rate')
+a.set_title('C  Neurons pushed down lose the\nstate they carry (about in proportion)')
 
 # D rewrite
 a = ax[1, 0]; rw = pd.read_csv(os.path.join(R, 'phase6_rewrite.csv'))
-items = [(rw.d1, "A's own memory\n(stim x cA_pre)", BLUE), (rw.d2, "copy from B\n(stim x cB_laser)", ORANGE),
+rw2 = pd.read_csv(os.path.join(sys.argv[1], 'phase7', 'phase7_rewrite_pre.csv'))
+items = [(rw2.d1, "A's own pre-laser state\n(stim x cA_pre)", BLUE), (rw2.d2, "B's pre-laser state\n(stim x cB_pre)", ORANGE),
          (rw.agree_stim - rw.agree_ctrl, 'end-point agreement\nA with B (stim - ctrl)', MUTED)]
 for i, (v, lab, col) in enumerate(items):
     strip(a, i, np.clip(v, -0.6, 0.6), col, i)
 a.axhline(0, color=GRID, lw=1, zorder=0); a.set_xticks(range(3)); a.set_xticklabels([l for _, l, _ in items], fontsize=7)
-a.set_title('D  After silencing, A recovers its OWN plan;\nit is not rewritten from B')
+a.set_title('D  After silencing, A returns to the same mix\nof its own and B\'s earlier state (no rewrite)')
 
 # E DLAG overlap
 a = ax[1, 1]
@@ -80,7 +80,7 @@ ov = os.path.join(R, 'phase6_dlag_overlap.csv')
 if os.path.exists(ov):
     o = pd.read_csv(ov); o = o[(o.rel_den > 0) & (o.pa > 0)]
     items = [('f_dlag_across', 'DLAG\nacross', BLUE), ('f_dlag_AtoB', 'DLAG\nA leads', BLUE), ('f_dlag_BtoA', 'DLAG\nB leads', BLUE),
-             ('f_dlag_within', 'DLAG\nwithin B', MUTED), ('f_rec_pa', 'receiving\n(same k)', AQUA), ('f_rand_pa', 'random\n(same k)', MUTED)]
+             ('f_dlag_within', 'DLAG\nwithin B', MUTED), ('g3_rec_pa', 'receiving\n(same k,\nunbiased)', AQUA), ('f_rand_pa', 'random\n(same k)', MUTED)]
     for i, (k, lab, col) in enumerate(items):
         strip(a, i, o[k].clip(-0.3, 1.05), col, i)
     a.set_xticks(range(len(items))); a.set_xticklabels([l for _, l, _ in items], fontsize=7)

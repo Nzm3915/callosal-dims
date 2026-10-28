@@ -1,0 +1,133 @@
+{
+ "A1": {
+  "phase2: receiving(3) - correlated(3) subspace": {
+   "n_mice": 39,
+   "median": 0.7628542442648284,
+   "p": 3.637978807091713e-12,
+   "n_pairs": 266,
+   "p_pairs": 2.3014487383965226e-45
+  },
+  "phase4: c0 (silencing lowers B confidence)": {
+   "n_mice": 39,
+   "median": -0.3028134406065711,
+   "p": 3.637978807091713e-12,
+   "n_pairs": 259,
+   "p_pairs": 2.4109081553066365e-40
+  },
+  "phase4: c1 (state dependence)": {
+   "n_mice": 39,
+   "median": -0.1164370326610379,
+   "p": 3.637978807091713e-12,
+   "n_pairs": 259,
+   "p_pairs": 3.433694354782338e-18
+  },
+  "phase6-1: top receiving direction - ramp mode": {
+   "n_mice": 39,
+   "median": 0.620248441,
+   "p": 3.637978807091713e-12,
+   "n_pairs": 266,
+   "p_pairs": 2.726807565323452e-45
+  },
+  "phase6-1: choice mode - random 1-D": {
+   "n_mice": 39,
+   "median": 0.020654240881673953,
+   "p": 1.4690511306980625e-05,
+   "n_pairs": 266,
+   "p_pairs": 5.69202844041796e-20
+  },
+  "phase6-2: stim x ramp (c3)": {
+   "n_mice": 39,
+   "median": -0.01185255022024515,
+   "p": 0.9066497695166618,
+   "n_pairs": 259,
+   "p_pairs": 0.8794646308848436
+  },
+  "phase6-3: c1 predicted from FS gain - observed": {
+   "n_mice": 30,
+   "median": 0.12376223488226058,
+   "p": 0.00020912662148475647,
+   "n_pairs": 115,
+   "p_pairs": 4.1441186859471296e-10
+  },
+  "phase6-5: DLAG across - receiving (same k)": {
+   "n_mice": 37,
+   "median": -0.6369026105420752,
+   "p": 1.4551915228366852e-11,
+   "n_pairs": 220,
+   "p_pairs": 8.340173147728068e-38
+  },
+  "phase6-5: DLAG across - random (same k)": {
+   "n_mice": 37,
+   "median": 0.13067551626319654,
+   "p": 1.6538251657038927e-07,
+   "n_pairs": 220,
+   "p_pairs": 2.363785265036562e-28
+  },
+  "phase6-6: d1 (own memory, stim x cA_pre)": {
+   "n_mice": 39,
+   "median": 0.07354704841256005,
+   "p": 0.0014682026667287573,
+   "n_pairs": 259,
+   "p_pairs": 2.701756641202207e-05
+  },
+  "phase7-1: c1 from round trip (c2-calibrated)": {
+   "n_mice": 39,
+   "median": -0.0006088863246207,
+   "p": 0.5571619422771619,
+   "n_pairs": 250,
+   "p_pairs": 0.24044974261662
+  },
+  "phase7-2: fraction of c1 by own (bootstrap over mice)": {
+   "fraction": 0.4244430165235543,
+   "ci": [
+    0.19166950554300938,
+    1.3894728905314233
+   ],
+   "n_mice": 39
+  },
+  "phase7-2: fraction of c1 by loop1 (bootstrap over mice)": {
+   "fraction": 0.7666938900819884,
+   "ci": [
+    0.3846173805772052,
+    2.54108092788802
+   ],
+   "n_mice": 39
+  }
+ },
+ "A2": {
+  "a1": {
+   "n_mice": 39,
+   "median": 0.3334972016338178,
+   "p": 3.637978807091713e-12,
+   "n_pairs": 259,
+   "p_pairs": 4.950250334190504e-44
+  },
+  "a2": {
+   "n_mice": 39,
+   "median": 0.0963289536879101,
+   "p": 3.637978807091713e-12,
+   "n_pairs": 259,
+   "p_pairs": 6.382341498713332e-24
+  },
+  "d1": {
+   "n_mice": 39,
+   "median": 0.006512310086914684,
+   "p": 0.8848204766291019,
+   "n_pairs": 259,
+   "p_pairs": 0.4115214803401901
+  },
+  "d2": {
+   "n_mice": 39,
+   "median": 0.024388866273657956,
+   "p": 0.1274971667153295,
+   "n_pairs": 259,
+   "p_pairs": 0.136670677997988
+  }
+ },
+ "A3": {
+  "n_labeled": 11933,
+  "n_ambiguous": 1066,
+  "silenced_by_both": 66,
+  "silenced_by_neither": 851
+ }
+}
