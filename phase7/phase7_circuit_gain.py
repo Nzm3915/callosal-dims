@@ -49,15 +49,39 @@ TGT_C1 = [-0.357, -0.208, -0.043, 0.009, 0.027]
 TGT_L0 = [0.613, 0.541, 0.438, 0.371, 0.312]
 PNAMES = ['lam', 'w_rand', 'c_s', 'rho_s', 'tau_s', 'p_amp', 'noise', 'p_ratio', 'w_inh']
 LO = np.array([0.05, 0.02, 0.02, 0.00, 0.08, 0.01, 0.002, 0.2, 0.0])
-HI = np.array([2.50, 0.50, 0.60, 0.95, 1.20, 0.50, 0.080, 6.0, 0.6])
+HI = np.array([6.00, 0.50, 0.60, 0.95, 1.20, 0.50, 0.080, 20.0, 0.6])
 
 
-def make_net(seed=0):
+# Where on its curve a cell sits decides the sign of the gain argument, so it is a named choice, not an accident.
+# For r = x/(1+x) with x = (k v)^n the local exponent of gain against rate is
+#     alpha(r, n) = 1 - r/(1-r) - (1/n) (1 + r/(1-r)),
+# which tends to (n-1)/n as r -> 0 - the exponent section 5.5 derives - and goes NEGATIVE above r = 1/(n+1)
+# (above r = (n-1)/(n+1) in the q = r/(1-r) variable, which is 25% of maximum for n = 2 and only 12% for n = 1.3):
+# past that point, lowering a cell's rate *raises* its gain.
+#
+# Section 5.5's argument is about a pure power law r = k [I]^n with no saturation, for which alpha = (n-1)/n
+# everywhere. A saturating curve reproduces that only where x = (k v)^n << 1, i.e. at a per cent or so of maximum
+# rate. Cortical pyramidal cells in ALM fire at a few to a few tens of spikes/s against a maximum well over 100,
+# so 'power' (1-6% of maximum, where the curve IS a power law to within ~10%) is the regime section 5.5 assumes,
+# and the one its numbers should be read in. The other two are kept as contrasts, to show what happens to the
+# estimators when the cells sit higher on their curve than the argument supposes.
+REGIMES = dict(power=(0.008, 0.06), expansive=(0.04, 0.35), mixed=(0.08, 0.85))
+
+
+def alpha_local(r, n):
+    q = r / np.clip(1 - r, 1e-9, None)
+    return 1 - q - (1 + q) / n
+
+
+def make_net(seed=0, regime='expansive'):
     """fixed structure; only the nine fitted scalars change between evaluations"""
     g = np.random.default_rng(seed)
     n = g.uniform(1.3, 2.5, 2 * N)                         # per-cell curvature of the input-output curve
-    k = np.exp(g.normal(0, 0.3, 2 * N))                    # per-cell scale
-    vstar = g.uniform(0.45, 1.45, 2 * N)                   # prescribed operating point, across the sensitive range
+    vstar = g.uniform(0.45, 1.45, 2 * N)                   # prescribed operating point
+    # the per-cell scale is solved from the operating rate, so where each cell sits on its curve is controlled
+    lo, hi = REGIMES[regime]
+    r0 = g.uniform(lo, hi, 2 * N)
+    k = (r0 / (1 - r0)) ** (1.0 / n) / vstar
     M = g.normal(0, 1, (N, N)) / np.sqrt(N); np.fill_diagonal(M, 0)
     u = None     # the slow (preparatory) mode: set below, along the choice-coding direction
     # callosal link: rank 3, as measured. The loadings are positively biased because callosal axons are excitatory,
@@ -72,7 +96,7 @@ def make_net(seed=0):
     # follows its input within about 0.1 s (Li et al. 2016, Nature 532:459). A slow mode along the mean would tie
     # those two together and the three measured timescales could not come apart, which is the point of the fit.
     u = np.r_[pA, pB]; u = u - u.mean(); u /= np.linalg.norm(u)
-    return dict(n=n, k=k, vstar=vstar, M=M, u=u, P=P, Q=Q, pA=pA, pB=pB)
+    return dict(n=n, k=k, vstar=vstar, M=M, u=u, P=P, Q=Q, pA=pA, pB=pB, r0=r0, regime=regime)
 
 
 def act(v, net):
@@ -246,22 +270,30 @@ def fit(net, n_tr, n_rand, n_ref, seed=100, verbose=True, rng_seed=1):
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True); t0 = time.time()
-    net = make_net(0)
-    # the fit runs at dt = 10 ms, which gives numbers indistinguishable from dt = 5 ms at half the cost; the final
-    # table is recomputed at dt = 5 ms, so the reported fit is not a product of the coarse step
-    globals()['DT'] = 0.010
-    best, bs = fit(net, 300, 60 if QUICK else 260, 6 if QUICK else 22)
-    print(f'fitted: score {bs:.3f}  {dict(zip(PNAMES, np.round(best, 4)))}', flush=True)
-    globals()['DT'] = 0.005
-    bs = score(best, net, 900, 7)
-    print(f'at dt = 5 ms, 900 trials: score {bs:.3f}', flush=True)
-    res, *_ = analyse(net, best, 1500, 7)
-    tbl = []
-    for w, tg, tc, tl in zip(WKEY, TGT_G, TGT_C1, TGT_L0):
-        r = res[w]
-        tbl.append(dict(win=w, g_model=r['g_wmean'], g_data=tg, c1_model=r['c1_rel'], c1_data=tc,
-                        L0_model=r['L0'], L0_data=tl))
-        print(f"  {w:12s} g {r['g_wmean']:.3f}/{tg:.3f}   c1 {r['c1_rel']:+.3f}/{tc:+.3f}   L0 {r['L0']:.3f}/{tl:.3f}", flush=True)
-    json.dump(dict(par=dict(zip(PNAMES, best.tolist())), score=float(bs), fit_table=tbl),
-              open(os.path.join(OUT, 'phase7_circuit_gain_fit.json'), 'w'), indent=1, default=float)
+    out = {}
+    for regime in (['power'] if QUICK else ['power', 'expansive', 'mixed']):
+        net = make_net(0, regime)
+        a = alpha_local(net['r0'], net['n'])
+        print(f"\n=== {regime}: operating rate {net['r0'].min():.2f}-{net['r0'].max():.2f} of maximum, "
+              f"local gain exponent alpha {a.min():+.2f} to {a.max():+.2f} (mean {a.mean():+.2f})", flush=True)
+        # the fit runs at dt = 10 ms, which gives numbers indistinguishable from dt = 5 ms at half the cost; the
+        # final table is recomputed at dt = 5 ms, so the reported fit is not a product of the coarse step
+        globals()['DT'] = 0.010
+        best, bs = fit(net, 300, 60 if QUICK else 190, 6 if QUICK else 15)
+        print(f'fitted: score {bs:.3f}  {dict(zip(PNAMES, np.round(best, 4)))}', flush=True)
+        globals()['DT'] = 0.005
+        bs5 = score(best, net, 900, 7)
+        print(f'at dt = 5 ms, 900 trials: score {bs5:.3f}', flush=True)
+        res, *_ = analyse(net, best, 1500, 7)
+        tbl = []
+        for w, tg, tc, tl in zip(WKEY, TGT_G, TGT_C1, TGT_L0):
+            r = res[w]
+            tbl.append(dict(win=w, g_model=r['g_wmean'], g_data=tg, c1_model=r['c1_rel'], c1_data=tc,
+                            L0_model=r['L0'], L0_data=tl))
+            print(f"  {w:12s} g {r['g_wmean']:.3f}/{tg:.3f}   c1 {r['c1_rel']:+.3f}/{tc:+.3f}   "
+                  f"L0 {r['L0']:.3f}/{tl:.3f}", flush=True)
+        out[regime] = dict(par=dict(zip(PNAMES, best.tolist())), score_fit=float(bs), score_dt5=float(bs5),
+                           alpha_local=dict(mean=float(a.mean()), lo=float(a.min()), hi=float(a.max())),
+                           operating_rate=[float(net['r0'].min()), float(net['r0'].max())], fit_table=tbl)
+        json.dump(out, open(os.path.join(OUT, 'phase7_circuit_gain_fit.json'), 'w'), indent=1, default=float)
     print('fit done', round(time.time() - t0), 's', flush=True)

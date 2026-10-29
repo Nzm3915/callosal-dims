@@ -67,7 +67,10 @@ def run(net, par, n_tr, seed):
              (dact_exact(d['v_ctrl'], dict(net, n=net['n'][B], k=net['k'][B])) + 1e-12)
     d['T'] = d['dI_stim'] / (d['dI_ctrl'] + np.sign(d['dI_ctrl'] + 1e-30) * 1e-9)
     d['T_rec'] = d['dR_stim'] / (d['dR_ctrl'] + np.sign(d['dR_ctrl'] + 1e-30) * 1e-9)
-    d['alpha_true'] = (net['n'][B] - 1) / net['n'][B]
+    # the cell's own exact local exponent of gain against rate, at its control operating point; (n-1)/n is its
+    # limit at low rate, which is what section 5.5 assumes
+    d['alpha_true'] = alpha_local(net['r0'][B], net['n'][B])
+    d['alpha_lowrate'] = (net['n'][B] - 1) / net['n'][B]
     return d
 
 
@@ -83,18 +86,16 @@ def cut_link(net, par, n_tr, seed):
     return out
 
 
-if __name__ == '__main__':
-    t0 = time.time()
-    fitf = os.path.join(OUT, 'phase7_circuit_gain_fit.json')
-    par = np.array([json.load(open(fitf))['par'][k] for k in PNAMES], float)
-    print('fitted parameters:', {k: round(v, 4) for k, v in zip(PNAMES, par)}, flush=True)
-    net = make_net(0)
-    d = run(net, par, NTR, 11)
+def report(regime, par, n_tr):
+    net = make_net(0, regime)
+    d = run(net, par, n_tr, 11)
     uc, us, g = d['u_ctrl'], d['u_stim'], d['g']
     obs = (us - uc).sum(); b1 = uc.sum()
-    res = dict(n_trials=NTR, b1=float(b1), obs_rel=float(obs / b1), window=W0,
+    res = dict(regime=regime, n_trials=n_tr, b1=float(b1), obs_rel=float(obs / b1), window=W0,
+               operating_rate=[float(net['r0'].min()), float(net['r0'].max())],
                alpha_true=dict(mean=float(d['alpha_true'].mean()), lo=float(d['alpha_true'].min()),
-                               hi=float(d['alpha_true'].max())))
+                               hi=float(d['alpha_true'].max()),
+                               lowrate_limit_mean=float(d['alpha_lowrate'].mean())))
     # --- 1. the gain factor
     cor = lambda a, b: float(np.corrcoef(a, b)[0, 1])
     res['gain_factor'] = {f'alpha={a}': dict(corr_with_G=cor(g ** a, d['G']),
@@ -131,8 +132,28 @@ if __name__ == '__main__':
                                      true_T=float(np.average(d['T'][m], weights=np.abs(uc[m]))),
                                      true_G=float(np.average(d['G'][m], weights=np.abs(uc[m]))))
     # --- 5. how much of B's state signal needs A
-    res['link'] = cut_link(net, par, max(NTR // 3, 600), 23)
+    res['link'] = cut_link(net, par, max(n_tr // 3, 600), 23)
     res['link']['fraction_via_A'] = 1 - res['link']['cut'] / res['link']['intact']
-    json.dump(res, open(os.path.join(OUT, 'phase7_circuit_truth.json'), 'w'), indent=1, default=float)
-    print(json.dumps(res, indent=1, default=float), flush=True)
+    return res
+
+
+if __name__ == '__main__':
+    t0 = time.time()
+    fits = json.load(open(os.path.join(OUT, 'phase7_circuit_gain_fit.json')))
+    out = {}
+    for regime, f in fits.items():
+        par = np.array([f['par'][k] for k in PNAMES], float)
+        print(f"\n=== {regime}: {{k: round(v, 4) for k, v in zip(PNAMES, par)}}".replace('{k: round(v, 4) for k, v in zip(PNAMES, par)}',
+              str({k: round(v, 4) for k, v in zip(PNAMES, par)})), flush=True)
+        r = report(regime, par, NTR)
+        out[regime] = r
+        print(f"  observed loss {r['obs_rel']:+.3f} of b1", flush=True)
+        print(f"  own gain, exact            {r['pooled']['exact_G_only']:+.3f} of the loss", flush=True)
+        print(f"  received signal, exact     {r['pooled']['exact_T_only']:+.3f}", flush=True)
+        print(f"  both, exact (check ~ 1)    {r['pooled']['exact_G_times_T']:+.3f}", flush=True)
+        for key in ('a0.5_k0', 'a1.0_k0', 'a1.3_k0', 'a1.0_k1', 'a1.0_k2'):
+            print(f"  section 5.5 estimator {key:9s} {r['pooled'][key]:+.3f}", flush=True)
+        print(f"  S_i vs the true input shrink: corr {r['recv_factor']['alpha=1.0,k=1']['corr_with_T']:+.3f}, "
+              f"S {r['recv_factor']['alpha=1.0,k=1']['wmean_S']:.3f} vs true {r['T']['wmean']:.3f}", flush=True)
+        json.dump(out, open(os.path.join(OUT, 'phase7_circuit_truth.json'), 'w'), indent=1, default=float)
     print('done', round(time.time() - t0), 's', flush=True)
