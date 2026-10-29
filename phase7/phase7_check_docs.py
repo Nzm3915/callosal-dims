@@ -59,8 +59,8 @@ check('label validation: mice', '39匹中36匹で同じ向きだった（p = 1.5
 au = json.load(open(os.path.join(R, 'phase7', 'phase7_audit.json')))['A1']
 own = au['phase7-2: fraction of c1 by own (bootstrap over mice)']
 loop = au['phase7-2: fraction of c1 by loop1 (bootstrap over mice)']
-check('gain pooled own (mouse bootstrap)', '42%（95%区間 19〜139%）',
-      (round(100 * own['fraction']), [round(100 * x) for x in own['ci']]))
+check('gain pooled own (mouse bootstrap)', '**0.42**（マウスを単位にした95%区間 0.19〜1.39）',
+      (round(own['fraction'], 2), [round(x, 2) for x in own['ci']]))
 check('gain pooled loop1 (mouse bootstrap)', '0.77（0.38〜2.54）',
       (round(loop['fraction'], 2), [round(x, 2) for x in loop['ci']]))
 gp = json.load(open(os.path.join(R, 'phase7', 'phase7_gain_pooled.json')))
@@ -105,5 +105,31 @@ es = json.load(open(os.path.join(R, 'quantum', 'energy_scales.json')))
 check('zeeman over kT', '$9\\times10^{-11}$ 倍', f"{es['zeeman_129Xe_50uT_over_kT']:.1e}", doc=doc3)
 check('hyperfine over kT', '$4\\times10^{-6}$ 倍', f"{es['hyperfine_129Xe_1mT_over_kT']:.1e}", doc=doc3)
 check('Xe mass equilibrium', '$10^{-4}$ 以下', f"{es['equilibrium_mass_effect_129Xe_132Xe_k10']:.1e}", doc=doc3)
+
+# 01 section 5.5: the circuit model that tests the algebra of B8
+ct = json.load(open(os.path.join(R, 'phase7', 'phase7_circuit_truth.json')))
+pw, ex, mx = ct['power'], ct['expansive'], ct['mixed']
+check('circuit: own gain exact (3 regimes)',
+      '| **細胞自身の利得だけ（厳密）** | **0.216** | **0.149** | 0.403 |',
+      (round(pw['pooled']['exact_G_only'], 3), round(ex['pooled']['exact_G_only'], 3),
+       round(mx['pooled']['exact_G_only'], 3)))
+check('circuit: received signal exact (3 regimes)',
+      '| **受け取る信号だけ（厳密）** | **0.968** | **0.966** | 0.935 |',
+      (round(pw['pooled']['exact_T_only'], 3), round(ex['pooled']['exact_T_only'], 3),
+       round(mx['pooled']['exact_T_only'], 3)))
+check('circuit: product check', '| 両方の積（検算、1になるべき） | 1.024 | 1.028 | 1.053 |',
+      (round(pw['pooled']['exact_G_times_T'], 3), round(ex['pooled']['exact_G_times_T'], 3),
+       round(mx['pooled']['exact_G_times_T'], 3)))
+check('circuit: section 5.5 estimator, no pass',
+      '| 5.5節の推定（$\\alpha$=1、1周なし） | 0.318 | 0.402 | 0.197 |',
+      (round(pw['pooled']['a1.0_k0'], 3), round(ex['pooled']['a1.0_k0'], 3), round(mx['pooled']['a1.0_k0'], 3)))
+check('circuit: section 5.5 estimator, two passes',
+      '| 5.5節の推定（2周） | 1.020 | 0.972 | 0.562 |',
+      (round(pw['pooled']['a1.0_k2'], 3), round(ex['pooled']['a1.0_k2'], 3), round(mx['pooled']['a1.0_k2'], 3)))
+check('circuit: unchanged-rate cells keep their own gain',
+      '**真の利得は 1.00／1.01／1.06 でまったく変わっていない**のに、運ぶ状態の傾きは 0.74／0.79／0.59 に落ちている',
+      (round(pw['unchanged_rate']['true_G'], 2), round(ex['unchanged_rate']['true_G'], 2),
+       round(mx['unchanged_rate']['true_G'], 2), round(pw['unchanged_rate']['slope_ratio'], 2),
+       round(ex['unchanged_rate']['slope_ratio'], 2), round(mx['unchanged_rate']['slope_ratio'], 2)))
 
 print(f'\n{ok} present, {bad} missing')
