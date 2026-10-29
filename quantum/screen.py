@@ -41,24 +41,38 @@ R_CONTACT = {'129Xe': 3.6, '131Xe': 3.6, '83Kr': 3.4, '3He': 3.0}   # van der Wa
 
 
 def ring_geom(R, placement, extra='', spin_atom=3):
-    """a benzene-like ring with a substituent; Xe above the ring plane (lobe) or in the plane beside it (node)"""
+    """a benzene-like ring with a substituent, and the guest at one of two places relative to the carbon that
+    carries the spin:
+      'lobe'  directly above that carbon, at height R: inside the pi lobe, where the coupling should be largest.
+      'node'  in the ring plane, on the ray from the ring centre through that carbon, R beyond the carbon - which
+              puts the guest outside the hydrogen shell, in the nodal plane of the pi orbital.
+    A first version placed the 'node' guest at +y from the carbon instead. For some rings that put it 0.6-1.5 A
+    from a ring hydrogen, i.e. inside another atom, and the couplings it returned were meaningless. Those numbers
+    are discarded; coupling() now also reports the closest contact so the same mistake is visible per row."""
     r = 1.40; ang = np.deg2rad([0, 60, 120, 180, 240, 300])
     C = [(r * np.cos(a), r * np.sin(a)) for a in ang]
     Hs = [(2.48 * np.cos(a), 2.48 * np.sin(a)) for a in ang[1:]]
     body = extra + '; '.join(f"C {x:.4f} {y:.4f} 0" for x, y in C) + '; ' + \
            '; '.join(f"H {x:.4f} {y:.4f} 0" for x, y in Hs)
-    pos = (C[spin_atom][0], C[spin_atom][1], R) if placement == 'lobe' else (C[spin_atom][0], C[spin_atom][1] + R, 0.0)
-    return pos, body
+    cx, cy = C[spin_atom]; n = np.hypot(cx, cy)
+    if placement == 'lobe':
+        return (cx, cy, R), body
+    # in-plane: slide outward along the ray until the closest contact with ANY atom equals R. Measuring R from the
+    # carbon instead would push the guest to within 1.9 A of the hydrogen that sits on the same ray.
+    at = np.array([[float(v) for v in t.split()[1:4]] for t in body.split(';')])
+    f = 1.0
+    for _ in range(200):
+        q = np.array([cx * f, cy * f, 0.0])
+        d = np.linalg.norm(at - q, axis=1).min()
+        if abs(d - R) < 1e-4:
+            break
+        f += (R - d) / n
+    return (cx * f, cy * f, 0.0), body
 
 
 def phenoxyl_geom(R, placement):
-    r = 1.40; ang = np.deg2rad([0, 60, 120, 180, 240, 300])
-    C = [(r * np.cos(a), r * np.sin(a)) for a in ang]
-    Hs = [(2.48 * np.cos(a), 2.48 * np.sin(a)) for a in ang[1:]]
-    body = f"O {r + 1.25:.4f} 0 0; " + '; '.join(f"C {x:.4f} {y:.4f} 0" for x, y in C) + '; ' + \
-           '; '.join(f"H {x:.4f} {y:.4f} 0" for x, y in Hs)
-    pos = (C[3][0], C[3][1], R) if placement == 'lobe' else (C[3][0], C[3][1] + R, 0.0)   # above C4, or in the plane
-    return pos, body
+    """tyrosyl model: the phenoxyl radical, spin on the para carbon (C4, opposite the oxygen)"""
+    return ring_geom(R, placement, extra=f"O {1.40 + 1.25:.4f} 0 0; ", spin_atom=3)
 
 
 def coupling(guest_elem, rad, placement, R):
