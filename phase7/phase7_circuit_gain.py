@@ -130,7 +130,10 @@ def simulate(net, par, n_tr, stim, seed, record_input=False, state=None, pre=Non
     ext = 0.0 if probe is None else probe
     keys = WKEY + ['pre']
     acc = {w: [np.zeros((n_tr, 2 * N)), 0] for w in keys}
-    inp = {w: np.zeros((n_tr, 2 * N)) for w in WKEY} if record_input else None
+    # with record_input the window means of three more quantities are kept: what a cell receives from the other
+    # cells, its total input, and its membrane variable - enough to split u_stim/u_ctrl exactly into a gain ratio
+    # and an input-shrink ratio, which is what the algebra of section 5.5 has to approximate
+    inp = {w: [np.zeros((n_tr, 2 * N)) for _ in range(3)] for w in WKEY} if record_input else None
     sd = np.sqrt(DT / TAU_R) * noise
     steps = int(round((T1 - T0 + BURN) / DT))
     for t_i in range(steps):
@@ -149,12 +152,13 @@ def simulate(net, par, n_tr, stim, seed, record_input=False, state=None, pre=Non
             if a <= t < b2:
                 acc[w][0] += r; acc[w][1] += 1
                 if record_input:
-                    inp[w] += rec
+                    inp[w][0] += rec; inp[w][1] += I; inp[w][2] += v
         if PRE[0] <= t < PRE[1]:
             acc['pre'][0] += r; acc['pre'][1] += 1
     out = {w: acc[w][0] / max(acc[w][1], 1) for w in keys}
     if record_input:
-        out['_inp'] = {w: inp[w] / max(acc[w][1], 1) for w in WKEY}
+        out['_inp'] = {w: dict(rec=inp[w][0] / max(acc[w][1], 1), I=inp[w][1] / max(acc[w][1], 1),
+                                v=inp[w][2] / max(acc[w][1], 1)) for w in WKEY}
     out['_s'] = s; out['_pre'] = st
     return out
 

@@ -1,0 +1,475 @@
+{
+ "pressure": {
+  "c50_xe_pct_atm": 53.0,
+  "potency_ratio": 4.736842105263158,
+  "c50_kr_pct_atm": 251.05263157894737,
+  "I_xe_at_50pct": 0.4854368932038835,
+  "kr_partial_pressure_for_match_atm": 2.3684210526315788,
+  "total_absolute_atm_with_20pct_O2": 2.568421052631579,
+  "I_kr_at_1atm": 0.28485757121439276
+ },
+ "effects": [
+  {
+   "radical": "methyl",
+   "placement": "lobe",
+   "r": 0.0,
+   "a129_mT": -3.78,
+   "a83_mT": -0.34,
+   "rel129": -0.3391755116288835,
+   "rel83": -0.43131367097602674,
+   "pts_xe": 16.464830661596288,
+   "pts_kr_matched": 20.937556843496445,
+   "pts_kr_1atm": 12.28629647457947
+  },
+  {
+   "radical": "methyl",
+   "placement": "lobe",
+   "r": 10000000.0,
+   "a129_mT": -3.78,
+   "a83_mT": -0.34,
+   "rel129": -0.3087181977181371,
+   "rel83": -0.4087499299930361,
+   "pts_xe": 14.986320277579471,
+   "pts_kr_matched": 19.842229611312433,
+   "pts_kr_1atm": 11.643551229186933
+  },
+  {
+   "radical": "methyl",
+   "placement": "lobe",
+   "r": 30000000.0,
+   "a129_mT": -3.78,
+   "a83_mT": -0.34,
+   "rel129": -0.2596132464185307,
+   "rel83": -0.36719572385291,
+   "pts_xe": 12.602584777598578,
+   "pts_kr_matched": 17.825035138490776,
+   "pts_kr_1atm": 10.45984820570508
+  },
+  {
+   "radical": "methyl",
+   "placement": "lobe",
+   "r": 100000000.0,
+   "a129_mT": -3.78,
+   "a83_mT": -0.34,
+   "rel129": -0.1501363856727901,
+   "rel83": -0.24786776711993133,
+   "pts_xe": 7.288174061785928,
+   "pts_kr_matched": 12.032415879608317,
+   "pts_kr_1atm": 7.060701012411836
+  },
+  {
+   "radical": "methyl",
+   "placement": "lobe",
+   "r": 300000000.0,
+   "a129_mT": -3.78,
+   "a83_mT": -0.34,
+   "rel129": -0.04681657817185698,
+   "rel83": -0.08159776453312326,
+   "pts_xe": 2.2726494258183,
+   "pts_kr_matched": 3.961056530734139,
+   "pts_kr_1atm": 2.324374102142941
+  },
+  {
+   "radical": "methyl",
+   "placement": "lobe",
+   "r": 1000000000.0,
+   "a129_mT": -3.78,
+   "a83_mT": -0.34,
+   "rel129": -0.006200176403591718,
+   "rel83": -0.0064785425137836965,
+   "pts_xe": 0.30097943706755914,
+   "pts_kr_matched": 0.3144923550380435,
+   "pts_kr_1atm": 0.18454618854856103
+  },
+  {
+   "radical": "hydroxyl",
+   "placement": "lobe",
+   "r": 0.0,
+   "a129_mT": -1.18,
+   "a83_mT": -0.085,
+   "rel129": -0.3074286364725992,
+   "rel83": -0.17347370401040219,
+   "pts_xe": 14.923720217116468,
+   "pts_kr_matched": 8.421053592737971,
+   "pts_kr_1atm": 4.941529799396763
+  },
+  {
+   "radical": "hydroxyl",
+   "placement": "lobe",
+   "r": 10000000.0,
+   "a129_mT": -1.18,
+   "a83_mT": -0.085,
+   "rel129": -0.2751834999175744,
+   "rel83": -0.15052276727195374,
+   "pts_xe": 13.358422326095846,
+   "pts_kr_matched": 7.306930450094842,
+   "pts_kr_1atm": 4.287754989755803
+  },
+  {
+   "radical": "hydroxyl",
+   "placement": "lobe",
+   "r": 30000000.0,
+   "a129_mT": -1.18,
+   "a83_mT": -0.085,
+   "rel129": -0.22406499993877635,
+   "rel83": -0.11469967526250538,
+   "pts_xe": 10.876941744600794,
+   "pts_kr_matched": 5.567945401092494,
+   "pts_kr_1atm": 3.267307091435685
+  },
+  {
+   "radical": "hydroxyl",
+   "placement": "lobe",
+   "r": 100000000.0,
+   "a129_mT": -1.18,
+   "a83_mT": -0.085,
+   "rel129": -0.11605087634654448,
+   "rel83": -0.04848006784645349,
+   "pts_xe": 5.633537686725461,
+   "pts_kr_matched": 2.353401351769587,
+   "pts_kr_1atm": 1.3809914379049717
+  },
+  {
+   "radical": "hydroxyl",
+   "placement": "lobe",
+   "r": 300000000.0,
+   "a129_mT": -1.18,
+   "a83_mT": -0.085,
+   "rel129": -0.027452889268485575,
+   "rel83": -0.008232096387852546,
+   "pts_xe": 1.3326645275963873,
+   "pts_kr_matched": 0.3996163295074052,
+   "pts_kr_1atm": 0.2344974983046452
+  },
+  {
+   "radical": "hydroxyl",
+   "placement": "lobe",
+   "r": 1000000000.0,
+   "a129_mT": -1.18,
+   "a83_mT": -0.085,
+   "rel129": -0.0020405473169509336,
+   "rel83": -0.00044203388552307266,
+   "pts_xe": 0.09905569499761814,
+   "pts_kr_matched": 0.02145795560791615,
+   "pts_kr_1atm": 0.01259166990245634
+  },
+  {
+   "radical": "superoxide",
+   "placement": "node",
+   "r": 0.0,
+   "a129_mT": 0.53,
+   "a83_mT": 0.029,
+   "rel129": -0.17942519201056534,
+   "rel83": -0.03973224558705161,
+   "pts_xe": 8.70996077721191,
+   "pts_kr_matched": 1.9287497857792044,
+   "pts_kr_1atm": 1.1318030976821296
+  },
+  {
+   "radical": "superoxide",
+   "placement": "node",
+   "r": 10000000.0,
+   "a129_mT": 0.53,
+   "a83_mT": 0.029,
+   "rel129": -0.1530452912796669,
+   "rel83": -0.028224461866155535,
+   "pts_xe": 7.429383071828491,
+   "pts_kr_matched": 1.3701195080658028,
+   "pts_kr_1atm": 0.8039951656026313
+  },
+  {
+   "radical": "superoxide",
+   "placement": "node",
+   "r": 30000000.0,
+   "a129_mT": 0.53,
+   "a83_mT": 0.029,
+   "rel129": -0.1155218573134984,
+   "rel83": -0.01749751827481862,
+   "pts_xe": 5.607857151140699,
+   "pts_kr_matched": 0.8493940910106127,
+   "pts_kr_1atm": 0.49843005580442834
+  },
+  {
+   "radical": "superoxide",
+   "placement": "node",
+   "r": 100000000.0,
+   "a129_mT": 0.53,
+   "a83_mT": 0.029,
+   "rel129": -0.04945232206077138,
+   "rel83": -0.006334075977447426,
+   "pts_xe": 2.400598158289873,
+   "pts_kr_matched": 0.307479416380943,
+   "pts_kr_1atm": 0.18043094988231043
+  },
+  {
+   "radical": "superoxide",
+   "placement": "node",
+   "r": 300000000.0,
+   "a129_mT": 0.53,
+   "a83_mT": 0.029,
+   "rel129": -0.008739769229335285,
+   "rel83": -0.0009932476870226207,
+   "pts_xe": 0.424260642200742,
+   "pts_kr_matched": 0.048215907137020425,
+   "pts_kr_1atm": 0.028293412373957706
+  },
+  {
+   "radical": "superoxide",
+   "placement": "node",
+   "r": 1000000000.0,
+   "a129_mT": 0.53,
+   "a83_mT": 0.029,
+   "rel129": -0.0004971975107637936,
+   "rel83": -5.173225980644113e-05,
+   "pts_xe": 0.02413580149338804,
+   "pts_kr_matched": 0.002511274747885492,
+   "pts_kr_1atm": 0.001473632588189477
+  },
+  {
+   "radical": "phenoxyl",
+   "placement": "lobe",
+   "r": 0.0,
+   "a129_mT": -0.237,
+   "a83_mT": -0.029,
+   "rel129": -0.06011029760301837,
+   "rel83": -0.03973224558705161,
+   "pts_xe": 2.9179756117970084,
+   "pts_kr_matched": 1.9287497857792044,
+   "pts_kr_1atm": 1.1318030976821296
+  },
+  {
+   "radical": "phenoxyl",
+   "placement": "lobe",
+   "r": 10000000.0,
+   "a129_mT": -0.237,
+   "a83_mT": -0.029,
+   "rel129": -0.04600282126756654,
+   "rel83": -0.028224461866155234,
+   "pts_xe": 2.2331466634741037,
+   "pts_kr_matched": 1.3701195080657882,
+   "pts_kr_1atm": 0.8039951656026226
+  },
+  {
+   "radical": "phenoxyl",
+   "placement": "lobe",
+   "r": 30000000.0,
+   "a129_mT": -0.237,
+   "a83_mT": -0.029,
+   "rel129": -0.031306172179818945,
+   "rel83": -0.01749751827481811,
+   "pts_xe": 1.5197170961077158,
+   "pts_kr_matched": 0.8493940910105879,
+   "pts_kr_1atm": 0.4984300558044138
+  },
+  {
+   "radical": "phenoxyl",
+   "placement": "lobe",
+   "r": 100000000.0,
+   "a129_mT": -0.237,
+   "a83_mT": -0.029,
+   "rel129": -0.012202917350441161,
+   "rel83": -0.006334075977447426,
+   "pts_xe": 0.5923746286621924,
+   "pts_kr_matched": 0.307479416380943,
+   "pts_kr_1atm": 0.18043094988231043
+  },
+  {
+   "radical": "phenoxyl",
+   "placement": "lobe",
+   "r": 300000000.0,
+   "a129_mT": -0.237,
+   "a83_mT": -0.029,
+   "rel129": -0.0019590603828032096,
+   "rel83": -0.000993247687022316,
+   "pts_xe": 0.09510001858268008,
+   "pts_kr_matched": 0.04821590713700564,
+   "pts_kr_1atm": 0.028293412373949025
+  },
+  {
+   "radical": "phenoxyl",
+   "placement": "lobe",
+   "r": 1000000000.0,
+   "a129_mT": -0.237,
+   "a83_mT": -0.029,
+   "rel129": -0.00010366193632957245,
+   "rel83": -5.173225980682524e-05,
+   "pts_xe": 0.005032132831532644,
+   "pts_kr_matched": 0.0025112747479041383,
+   "pts_kr_1atm": 0.0014736325882004188
+  }
+ ],
+ "n_cells": {
+  "methyl/lobe/r=0e+00": {
+   "sigma=4": {
+    "xe": 1,
+    "kr_matched": 1,
+    "kr_1atm": 2
+   },
+   "sigma=6": {
+    "xe": 2,
+    "kr_matched": 1,
+    "kr_1atm": 3
+   },
+   "sigma=8": {
+    "xe": 3,
+    "kr_matched": 2,
+    "kr_1atm": 5
+   }
+  },
+  "methyl/lobe/r=1e+08": {
+   "sigma=4": {
+    "xe": 4,
+    "kr_matched": 2,
+    "kr_1atm": 4
+   },
+   "sigma=6": {
+    "xe": 8,
+    "kr_matched": 3,
+    "kr_1atm": 8
+   },
+   "sigma=8": {
+    "xe": 13,
+    "kr_matched": 5,
+    "kr_1atm": 14
+   }
+  },
+  "hydroxyl/lobe/r=0e+00": {
+   "sigma=4": {
+    "xe": 1,
+    "kr_matched": 3,
+    "kr_1atm": 7
+   },
+   "sigma=6": {
+    "xe": 2,
+    "kr_matched": 6,
+    "kr_1atm": 16
+   },
+   "sigma=8": {
+    "xe": 4,
+    "kr_matched": 10,
+    "kr_1atm": 28
+   }
+  },
+  "hydroxyl/lobe/r=1e+08": {
+   "sigma=4": {
+    "xe": 6,
+    "kr_matched": 31,
+    "kr_1atm": 89
+   },
+   "sigma=6": {
+    "xe": 12,
+    "kr_matched": 69,
+    "kr_1atm": 199
+   },
+   "sigma=8": {
+    "xe": 22,
+    "kr_matched": 122,
+    "kr_1atm": 353
+   }
+  },
+  "superoxide/node/r=0e+00": {
+   "sigma=4": {
+    "xe": 3,
+    "kr_matched": 46,
+    "kr_1atm": 132
+   },
+   "sigma=6": {
+    "xe": 5,
+    "kr_matched": 102,
+    "kr_1atm": 296
+   },
+   "sigma=8": {
+    "xe": 9,
+    "kr_matched": 181,
+    "kr_1atm": 525
+   }
+  },
+  "superoxide/node/r=1e+08": {
+   "sigma=4": {
+    "xe": 30,
+    "kr_matched": 1779,
+    "kr_1atm": 5165
+   },
+   "sigma=6": {
+    "xe": 66,
+    "kr_matched": 4002,
+    "kr_1atm": 11620
+   },
+   "sigma=8": {
+    "xe": 117,
+    "kr_matched": 7114,
+    "kr_1atm": 20657
+   }
+  },
+  "phenoxyl/lobe/r=0e+00": {
+   "sigma=4": {
+    "xe": 20,
+    "kr_matched": 46,
+    "kr_1atm": 132
+   },
+   "sigma=6": {
+    "xe": 45,
+    "kr_matched": 102,
+    "kr_1atm": 296
+   },
+   "sigma=8": {
+    "xe": 79,
+    "kr_matched": 181,
+    "kr_1atm": 525
+   }
+  },
+  "phenoxyl/lobe/r=1e+08": {
+   "sigma=4": {
+    "xe": 480,
+    "kr_matched": 1779,
+    "kr_1atm": 5165
+   },
+   "sigma=6": {
+    "xe": 1078,
+    "kr_matched": 4002,
+    "kr_1atm": 11620
+   },
+   "sigma=8": {
+    "xe": 1917,
+    "kr_matched": 7114,
+    "kr_1atm": 20657
+   }
+  }
+ },
+ "supply": {
+  "abundance_pct": {
+   "83Kr": 11.49,
+   "84Kr": 56.99,
+   "86Kr": 17.28,
+   "129Xe": 26.4,
+   "131Xe": 21.23,
+   "132Xe": 26.91
+  },
+  "enrichment_needed": {
+   "spin_arm": "83Kr, 11.5% natural: enrichment required",
+   "control_arm": "84Kr, 57.0% natural: the majority isotope"
+  },
+  "xenon_for_comparison": {
+   "spin_arm": "129Xe, 26.4%",
+   "control_arm": "132Xe, 26.9%"
+  }
+ },
+ "confounds": {
+  "mass_difference": {
+   "kr_rel": 0.012036568010227521,
+   "xe_rel": 0.023265195298863468,
+   "ratio": 1.9328761553205978,
+   "note": "any mass-dependent artefact (diffusion ~ 1/sqrt(m), zero-point energy ~ 1/sqrt(m)) is smaller for the krypton pair by this factor"
+  },
+  "diffusion_ratio": {
+   "kr": 1.0060002823112066,
+   "xe": 1.0115657147703572
+  },
+  "pressure_reversal": {
+   "note": "a few atmospheres antagonise anaesthesia (pressure reversal), so a krypton experiment at 2.5 atm cannot be compared with a xenon experiment at 1 atm. It can be compared with 84Kr at the same pressure: both arms sit at identical total pressure, so the reversal cancels in the isotope difference. The cost is that the absolute block is smaller than pressure-free potency predicts, which is why the block has to be measured in the chamber rather than assumed."
+  },
+  "nuclear_relaxation": {
+   "note": "83Kr has I = 9/2 and a large quadrupole moment (0.259 b), so its nuclear relaxation in a cavity is fast by NMR standards - T1 of order 1-10 ms, i.e. 1e2-1e3 /s. That is 1e4-1e5 times slower than the radical pair recombines (5.5e7 /s), so the nuclear spin is static over the pair lifetime and the quadrupole cannot wash the effect out. The relaxation that matters is the electron's."
+  }
+ }
+}

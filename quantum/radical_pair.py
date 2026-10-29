@@ -59,14 +59,33 @@ def singlet_yield(I, a_mT, B_mT, k, a_bg_mT=0.5, r=0.0):
     if r == 0:                                                # coherent: closed form in the eigenbasis
         E, V = np.linalg.eigh(H); P = V.conj().T @ PS @ V; dw = E[:, None] - E[None, :]
         return float(np.real(np.sum(np.abs(P) ** 2 * k ** 2 / (k ** 2 + dw ** 2))) / Z)
+    rho0 = PS / Z
+    if n > 48:
+        # For a large nuclear spin the Liouvillian is n^2 x n^2 - 6400 x 6400 for I = 9/2, several GB once the
+        # Kronecker products are formed. The superoperator is never built: -L is applied to a matrix directly and
+        # the equation is solved iteratively, which costs a few n x n products per step.
+        from scipy.sparse.linalg import LinearOperator, gmres
+        SS = [Sop @ Sop for Sop in S1]
+
+        def mv(x):
+            R = x.reshape(n, n)
+            out = 1j * (H @ R - R @ H) + k * R
+            for Sop, S2op in zip(S1, SS):
+                out -= r * (Sop @ R @ Sop - 0.5 * (S2op @ R + R @ S2op))
+            return out.reshape(-1)
+
+        A = LinearOperator((n * n, n * n), matvec=mv, dtype=complex)
+        x, info = gmres(A, rho0.reshape(-1).astype(complex), rtol=1e-10, atol=0.0, restart=200, maxiter=40)
+        if info != 0:
+            raise RuntimeError(f'gmres did not converge (info={info}, n={n})')
+        return float(np.real(k * np.trace(PS @ x.reshape(n, n))))
     Id = np.eye(n)
     # Liouvillian on vec(rho) (column stacking): vec(A rho B) = (B^T kron A) vec(rho)
     Lv = -1j * (np.kron(Id, H) - np.kron(H.T, Id)) - k * np.eye(n * n)
     for Sop in S1:                                            # Lindblad: r (S rho S - 1/2 {S S, rho}), S Hermitian
         SS = Sop @ Sop
         Lv += r * (np.kron(Sop.T, Sop) - 0.5 * np.kron(Id, SS) - 0.5 * np.kron(SS.T, Id))
-    rho0 = (PS / Z).reshape(-1, order='F')
-    x = np.linalg.solve(-Lv, rho0)                            # integral of rho(t) dt
+    x = np.linalg.solve(-Lv, rho0.reshape(-1, order='F'))     # integral of rho(t) dt
     return float(np.real(k * np.trace(PS @ x.reshape(n, n, order='F'))))
 
 
