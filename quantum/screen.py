@@ -88,7 +88,9 @@ def coupling(guest_elem, rad, placement, R):
         dm0[s_, :nx, :nx] = mg.make_rdm1() / 2; dm0[s_, nx:, nx:] = dd
     mf = dft.UKS(mol); mf.xc = 'pbe0'; mf.conv_tol = 1e-9; mf.max_cycle = 200; mf.level_shift = 0.2; mf.kernel(dm0)
     A, a = a_iso(mol, mf, 0, 1.0)                     # per unit g_N: scale per isotope below
-    return A, a, bool(mf.converged)
+    # closest contact: a guest wedged against a hydrogen would make the number meaningless
+    d = np.linalg.norm(mol.atom_coords()[1:] - mol.atom_coords()[0], axis=1) * 0.529177
+    return A, a, bool(mf.converged), float(d.min())
 
 
 if __name__ == '__main__':
@@ -106,8 +108,8 @@ if __name__ == '__main__':
                     try:
                         cache[el] = coupling(el, rad, placement, R_CONTACT[g])
                     except Exception as e:
-                        print('FAIL', rad, placement, el, str(e)[:70], flush=True); cache[el] = (np.nan,) * 3
-                A_unit, a_unit, conv = cache[el]
+                        print('FAIL', rad, placement, el, str(e)[:70], flush=True); cache[el] = (np.nan,) * 4
+                A_unit, a_unit, conv, dmin = cache[el]
                 a = a_unit * gN                                  # mT, for this isotope's g_N
                 if not np.isfinite(a):
                     continue
@@ -124,9 +126,9 @@ if __name__ == '__main__':
                         z0 = singlet_yield(0, 0, 0.05, K_RP, A_BG, r); z = singlet_yield(I, a, 0.05, K_RP, A_BG, r)
                         if I132 * abs(100 * (z - z0) / z0) > MARGIN:
                             rmax = r
-                rows.append(dict(radical=rad, placement=placement, guest=g, I=I, R_A=R_CONTACT[g],
+                rows.append(dict(radical=rad, placement=placement, guest=g, I=I, R_A=R_CONTACT[g], min_contact_A=dmin,
                                  a_mT=a, rel_norelax=rel0, rel_r1e8=rel8, r_max_detectable=rmax, converged=conv))
-                print(f'{rad:11s} {placement:5s} {g:5s} a={a:+7.3f} mT  effect {rel0:+7.2f}% (r=0), '
+                print(f'{rad:11s} {placement:5s} {g:5s} d={dmin:.2f}A a={a:+7.3f} mT  effect {rel0:+7.2f}% (r=0), '
                       f'{rel8:+6.2f}% (r=1e8), detectable up to r = {rmax:.0e} /s   [{round(time.time()-t0)} s]', flush=True)
                 rows[-1]['relaxation_skipped'] = bool(big)
                 json.dump(rows, open(fn, 'w'), indent=1)
